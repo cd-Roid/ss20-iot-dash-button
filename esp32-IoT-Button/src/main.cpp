@@ -93,6 +93,8 @@ void callback(char *topic, byte *payload, unsigned int length)
   Serial.println(doc[0]["name"].as<char *>());
   len = doc.size();
   Serial.println(len);
+  if (hits >= len)
+    hits = len - 1;
   lastHit = -1;
 }
 
