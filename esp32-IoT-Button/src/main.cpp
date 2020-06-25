@@ -13,6 +13,7 @@ PubSubClient client(espClient);
 rgb_lcd lcd;
 const int switchPin = 33;
 static int hits = 0;
+int lastHit = -1;
 int switchState = 0;
 int prevSwitchState = 0;
 int len = 0;
@@ -92,6 +93,7 @@ void callback(char *topic, byte *payload, unsigned int length)
   Serial.println(doc[0]["name"].as<char *>());
   len = doc.size();
   Serial.println(len);
+  lastHit = -1;
 }
 
 void setup()
@@ -140,19 +142,21 @@ void loop()
     delay(10);
   }
 
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print(doc[hits]["name"].as<char *>());
-  lcd.setCursor(0, 1);
-  String quantity = doc[hits]["quantitiy"].as<char *>();
-  quantity += " St";
-  lcd.print(quantity);
-  lcd.write((unsigned char)0);
-  lcd.print("ck");
-  lcd.setCursor(13, 1);
-  lcd.print(hits + 1);
-  lcd.print("/");
-  lcd.print(len);
-
-  delay(500);
+  if (hits != lastHit)
+  {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(doc[hits]["name"].as<char *>());
+    lcd.setCursor(0, 1);
+    String quantity = doc[hits]["quantitiy"].as<char *>();
+    quantity += " St";
+    lcd.print(quantity);
+    lcd.write((unsigned char)0);
+    lcd.print("ck");
+    lcd.setCursor(13, 1);
+    lcd.print(hits + 1);
+    lcd.print("/");
+    lcd.print(len);
+    lastHit = hits;
+  }
 }
