@@ -50,6 +50,7 @@ void setupWifi()
 /*** Connenct/Reconnect to MQTT Broker in Case of Connection loss ***/
 const char *broker = "test.mosquitto.org";                          //Adresse des Brokers
 const char *inTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/list"; //Ein Topic
+const char *outTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/order/1234";
 
 void reconnect()
 {
@@ -89,6 +90,7 @@ void callback(char *topic, byte *payload, unsigned int length)
   {
     Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
   }
+  doc.clear();
   deserializeJson(doc, payload, length);
   Serial.println(doc[0]["name"].as<char *>());
   len = doc.size();
@@ -106,12 +108,48 @@ void setup()
   client.setCallback(callback);
 
   lcd.begin(16, 2);
-  pinMode(switchPin, OUTPUT);
+  pinMode(switchPin, INPUT);
 
   lcd.setCursor(0, 0);
   lcd.print("Swipe 2 Navigate");
   lcd.createChar(0, customChar);
   paj7620Init();
+}
+
+void orderProduct()
+{
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Bestelle");
+  lcd.setCursor(0, 1);
+  lcd.print(doc[hits]["name"].as<char *>());
+  lcd.print("?");
+  delay(400);
+  int i = 0;
+  while (1)
+  {
+    switchState = digitalRead(switchPin);
+    if (switchState != prevSwitchState)
+    {
+      if (switchState == HIGH)
+      {
+        char buffer[256];
+        size_t n = serializeJson(doc[hits], buffer);
+        client.publish_P(outTopic, buffer, n);
+        bzero(buffer, n);
+        lastHit = -1;
+        delay(400);
+        break;
+      }
+    }
+    i++;
+    if (i == 8000)
+    {
+      lastHit = -1;
+      break;
+    }
+    delay(1);
+  }
 }
 
 void loop()
@@ -146,6 +184,7 @@ void loop()
 
   if (hits != lastHit)
   {
+    Serial.println(hits);
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print(doc[hits]["name"].as<char *>());
@@ -160,5 +199,15 @@ void loop()
     lcd.print("/");
     lcd.print(len);
     lastHit = hits;
+  }
+
+  switchState = digitalRead(switchPin);
+  if (switchState != prevSwitchState)
+  {
+    if (switchState == HIGH)
+    {
+      orderProduct();
+      delay(10);
+    }
   }
 }
