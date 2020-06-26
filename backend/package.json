@@ -1,0 +1,21 @@
+{
+  "name": "backend-dashbutton",
+  "version": "1.0.0",
+  "description": "The Backend for an IoT Dashbutton for ordering products",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.9.20",
+    "mqtt": "^4.1.0",
+    "nodemon": "^2.0.4",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.3.1"
+  }
+}
