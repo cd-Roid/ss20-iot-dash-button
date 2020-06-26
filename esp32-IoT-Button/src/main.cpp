@@ -17,6 +17,7 @@ int lastHit = -1;
 int switchState = 0;
 int prevSwitchState = 0;
 int len = 0;
+int timer = 0;
 StaticJsonDocument<256> doc;
 
 byte customChar[] = {
@@ -98,11 +99,15 @@ void callback(char *topic, byte *payload, unsigned int length)
   if (hits >= len)
     hits = len - 1;
   lastHit = -1;
+  timer = 0;
+  delay(500);
 }
 
 void setup()
 {
   Serial.begin(9600);
+  esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 1);
+  timer = 0;
   setupWifi();
   client.setServer(broker, 1883);
   client.setCallback(callback);
@@ -111,7 +116,7 @@ void setup()
   pinMode(switchPin, INPUT);
 
   lcd.setCursor(0, 0);
-  lcd.print("Swipe 2 Navigate");
+  lcd.print("Welcome :)");
   lcd.createChar(0, customChar);
   paj7620Init();
 }
@@ -170,6 +175,7 @@ void loop()
       hits = hits + 1;
     else
       hits = 0;
+
     delay(10);
   }
 
@@ -179,6 +185,7 @@ void loop()
       hits = len - 1;
     else
       hits = hits - 1;
+    timer = 0;
     delay(10);
   }
 
@@ -210,4 +217,13 @@ void loop()
       delay(10);
     }
   }
+  timer++;
+  if (timer == 8000)
+  {
+    lcd.setRGB(0, 0, 0);
+    lcd.noDisplay();
+    lastHit = -1;
+    esp_deep_sleep_start();
+  }
+  delay(1);
 }
