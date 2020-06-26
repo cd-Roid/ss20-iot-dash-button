@@ -18,9 +18,45 @@
       <h1>Aktuell bestellbar</h1>
       <ul id="orders" class="list-group"></ul>
     </div>
-    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <div class="container col-sm-6 offset-sm-3">
+      <form action="">
+        <div class="row">
+          <div class="col">
+            <input
+              type="text"
+              id="product"
+              class="form-control"
+              placeholder="Product name"
+            />
+          </div>
+          <div class="col">
+            <input
+              type="number"
+              id="quantitiy"
+              class="form-control"
+              placeholder="Quantitiy"
+            />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Add</button>
+      </form>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
       var socket = io();
+      let form = document.querySelector('form');
+      let name = document.querySelector('#product');
+      let quantitiy = document.querySelector('#quantitiy');
+      form.addEventListener('submit', function (e) {
+        e.preventDefault(); // prevents page reloading
+        let sendName = name.value;
+        let sendQuan = quantitiy.value;
+        socket.emit('newProduct', { name: sendName, quantitiy: sendQuan });
+        name.value = '';
+        quantitiy.value = '';
+        return false;
+      });
+
       socket.on('order', function (msg) {
         console.log(msg);
         let messages = document.querySelector('#messages');

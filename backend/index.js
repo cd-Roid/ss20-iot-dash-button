@@ -32,6 +32,11 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
   console.log('a user connected');
+  socket.on('newProduct', (msg) => {
+    orderList.push(msg);
+    client.publish("thkoeln/IoT/bmw/montage/mittelkonsole/list", JSON.stringify(orderList), {retain: true})
+    console.log( msg);
+  });
   io.emit("orderList", orderList);
 });
 
