@@ -2,62 +2,50 @@
 <html>
   <head>
     <title>Socket.IO chat</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      body {
-        font: 13px Helvetica, Arial;
-      }
-      form {
-        background: #000;
-        padding: 3px;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-      }
-      form input {
-        border: 0;
-        padding: 10px;
-        width: 90%;
-        margin-right: 0.5%;
-      }
-      form button {
-        width: 9%;
-        background: rgb(130, 224, 255);
-        border: none;
-        padding: 10px;
-      }
-      #messages {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-      }
-      #messages li {
-        padding: 5px 10px;
-      }
-      #messages li:nth-child(odd) {
-        background: #eee;
-      }
-    </style>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+      crossorigin="anonymous"
+    />
   </head>
-  <body>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
-    <script src="/socket.io/socket.io.js"></script>
+  <body class="jumbotron">
+    <div class="container col-sm-6 offset-sm-3">
+      <h1>New Orders</h1>
+      <ul id="messages" class="list-group"></ul>
+    </div>
+    <div class="container col-sm-6 offset-sm-3">
+      <h1>Aktuell bestellbar</h1>
+      <ul id="orders" class="list-group"></ul>
+    </div>
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
     <script>
       var socket = io();
       socket.on('order', function (msg) {
-        msg = JSON.parse(msg);
         console.log(msg);
         let messages = document.querySelector('#messages');
         let neworder = document.createElement('li');
-        neworder.innerHTML = msg.name;
+        neworder.classList.add('card');
+        neworder.classList.add('list-group-item');
+        let ma = msg.topic.split('/');
+        ma = ma[ma.length - 1];
+        neworder.innerHTML = `<div class="card-body">
+          <h5 class="card-title">${msg.msg.name}</h5>
+          <p class="card-text">Anzahl: ${msg.msg.quantitiy}<br>Mitarbeiter: ${ma}</p></div>`;
         messages.append(neworder);
+      });
+      socket.on('orderList', function (msg) {
+        //msg = JSON.parse(msg);
+        console.log(msg);
+        let messages = document.querySelector('#orders');
+        messages.innerHTML = '';
+        msg.forEach((msg) => {
+          let neworder = document.createElement('li');
+          neworder.classList.add('card');
+          neworder.classList.add('list-group-item');
+          neworder.innerHTML = `${msg.name}, Anzahl: ${msg.quantitiy}`;
+          messages.append(neworder);
+        });
       });
     </script>
   </body>
