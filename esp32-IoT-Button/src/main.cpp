@@ -6,6 +6,9 @@
 #include "credentials.h"
 #include "rgb_lcd.h"
 #include "paj7620.h"
+#include <ESP32Encoder.h>
+
+ESP32Encoder encoder;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -73,6 +76,11 @@ byte bottomRightCheck[] = {
 /*** Initales verbinden mit WLAN ***/
 void setupWifi()
 {
+  int counter = 0;
+  int retryCounter = 0;
+  lcd.setCursor(0, 0);
+  lcd.print("to ");
+  lcd.print(ssid);
   Serial.print("\nConnecting to");
   Serial.println(ssid);
 
@@ -80,8 +88,23 @@ void setupWifi()
 
   while (WiFi.status() != WL_CONNECTED)
   {
+    if (counter > 20)
+    {
+      retryCounter++;
+      WiFi.reconnect();
+      counter = 0;
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Retry ");
+      lcd.print(retryCounter);
+      delay(1000);
+    }
     delay(100);
+    lcd.setCursor(0, 2);
+    lcd.print("Status ");
+    lcd.print(WiFi.status());
     Serial.println(WiFi.status());
+    counter++;
   }
 
   Serial.print("\nConnected to");
@@ -146,17 +169,20 @@ void callback(char *topic, byte *payload, unsigned int length)
 void setup()
 {
   Serial.begin(9600);
+  ESP32Encoder::useInternalWeakPullResistors = UP;
+  encoder.attachHalfQuad(14, 27);
+  encoder.setCount(37);
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 1);
   timer = 0;
+  lcd.begin(16, 2);
+  lcd.setCursor(0, 0);
+  lcd.print("Welcome :)");
   setupWifi();
   client.setServer(broker, 1883);
   client.setCallback(callback);
 
-  lcd.begin(16, 2);
   pinMode(switchPin, INPUT);
 
-  lcd.setCursor(0, 0);
-  lcd.print("Welcome :)");
   lcd.createChar(0, customChar);
   lcd.createChar(1, topLeftCheck);
   lcd.createChar(2, topRightCheck);
@@ -252,7 +278,7 @@ void loop()
     lcd.setCursor(0, 0);
     lcd.print(doc[hits]["name"].as<char *>());
     lcd.setCursor(0, 1);
-    String quantity = doc[hits]["quantitiy"].as<char *>();
+    String quantity = doc[hits]["quantity"].as<char *>();
     quantity += " St";
     lcd.print(quantity);
     lcd.write((unsigned char)0);
