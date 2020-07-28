@@ -280,7 +280,8 @@ void loop()
     }
     else
     {
-      currentQuantity -= step;
+      if (currentQuantity - step > 0)
+        currentQuantity -= step;
     }
     itoa(currentQuantity, snum, 10);
     doc[hits]["quantity"] = snum;
