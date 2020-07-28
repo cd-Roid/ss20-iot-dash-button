@@ -82,8 +82,7 @@ void setupWifi()
   int counter = 0;
   int retryCounter = 0;
   lcd.setCursor(0, 0);
-  lcd.print("to ");
-  lcd.print(ssid);
+  lcd.print("Connecting...");
   Serial.print("\nConnecting to");
   Serial.println(ssid);
 
@@ -91,16 +90,11 @@ void setupWifi()
 
   while (WiFi.status() != WL_CONNECTED)
   {
-    if (counter > 20)
+    if (counter > 25)
     {
       retryCounter++;
       WiFi.reconnect();
       counter = 0;
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("Retry ");
-      lcd.print(retryCounter);
-      delay(100);
     }
     delay(100);
     lcd.setCursor(0, 2);
@@ -278,14 +272,15 @@ void loop()
   if (encoder.getCount() != lastCount && encoder.getCount() % 2 == 0)
   {
     int currentQuantity = atoi(doc[hits]["quantity"]);
+    int step = atoi(doc[hits]["step"]);
     char snum[5];
     if (encoder.getCount() > lastCount)
     {
-      currentQuantity += 10;
+      currentQuantity += step;
     }
     else
     {
-      currentQuantity -= 10;
+      currentQuantity -= step;
     }
     itoa(currentQuantity, snum, 10);
     doc[hits]["quantity"] = snum;
