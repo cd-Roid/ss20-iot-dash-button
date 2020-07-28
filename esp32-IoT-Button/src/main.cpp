@@ -30,6 +30,46 @@ byte customChar[] = {
     B01110,
     B00000};
 
+byte topLeftCheck[] = {
+    B00001,
+    B00011,
+    B00111,
+    B01111,
+    B11111,
+    B11111,
+    B11111,
+    B11111};
+
+byte topRightCheck[] = {
+    B10000,
+    B11000,
+    B11100,
+    B11110,
+    B11111,
+    B11111,
+    B11101,
+    B11101};
+
+byte bottomLeftCheck[] = {
+    B11111,
+    B11011,
+    B11101,
+    B11110,
+    B01111,
+    B00111,
+    B00011,
+    B00001};
+
+byte bottomRightCheck[] = {
+    B11011,
+    B10111,
+    B01111,
+    B11111,
+    B11110,
+    B11100,
+    B11000,
+    B10000};
+
 /*** Initales verbinden mit WLAN ***/
 void setupWifi()
 {
@@ -118,7 +158,23 @@ void setup()
   lcd.setCursor(0, 0);
   lcd.print("Welcome :)");
   lcd.createChar(0, customChar);
+  lcd.createChar(1, topLeftCheck);
+  lcd.createChar(2, topRightCheck);
+  lcd.createChar(3, bottomLeftCheck);
+  lcd.createChar(4, bottomRightCheck);
   paj7620Init();
+}
+
+void displaySuccess()
+{
+  lcd.clear();
+  lcd.setCursor(7, 0);
+  lcd.write(1);
+  lcd.write(2);
+  lcd.setCursor(7, 1);
+  lcd.write(3);
+  lcd.write(4);
+  delay(1500);
 }
 
 void orderProduct()
@@ -143,7 +199,7 @@ void orderProduct()
         client.publish_P(outTopic, buffer, n);
         bzero(buffer, n);
         lastHit = -1;
-        delay(400);
+        displaySuccess();
         break;
       }
     }
