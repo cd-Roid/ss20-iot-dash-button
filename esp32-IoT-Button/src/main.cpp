@@ -8,7 +8,10 @@
 #include "paj7620.h"
 #include <ESP32Encoder.h>
 
+#define WAKEUP_PIN_BITMASK 0x100004000
+
 ESP32Encoder encoder;
+int lastCount = 0;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -21,7 +24,7 @@ int switchState = 0;
 int prevSwitchState = 0;
 int len = 0;
 int timer = 0;
-StaticJsonDocument<256> doc;
+DynamicJsonDocument doc(1024);
 
 byte customChar[] = {
     B00000,
@@ -97,7 +100,7 @@ void setupWifi()
       lcd.setCursor(0, 0);
       lcd.print("Retry ");
       lcd.print(retryCounter);
-      delay(1000);
+      delay(100);
     }
     delay(100);
     lcd.setCursor(0, 2);
@@ -171,8 +174,9 @@ void setup()
   Serial.begin(9600);
   ESP32Encoder::useInternalWeakPullResistors = UP;
   encoder.attachHalfQuad(14, 27);
-  encoder.setCount(37);
+  encoder.setCount(0);
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 1);
+  esp_sleep_enable_ext1_wakeup(WAKEUP_PIN_BITMASK, ESP_EXT1_WAKEUP_ALL_LOW);
   timer = 0;
   lcd.begin(16, 2);
   lcd.setCursor(0, 0);
@@ -257,7 +261,7 @@ void loop()
       hits = hits + 1;
     else
       hits = 0;
-
+    timer = 0;
     delay(10);
   }
 
@@ -269,6 +273,25 @@ void loop()
       hits = hits - 1;
     timer = 0;
     delay(10);
+  }
+
+  if (encoder.getCount() != lastCount && encoder.getCount() % 2 == 0)
+  {
+    int currentQuantity = atoi(doc[hits]["quantity"]);
+    char snum[5];
+    if (encoder.getCount() > lastCount)
+    {
+      currentQuantity += 10;
+    }
+    else
+    {
+      currentQuantity -= 10;
+    }
+    itoa(currentQuantity, snum, 10);
+    doc[hits]["quantity"] = snum;
+    lastCount = encoder.getCount();
+    lastHit = -1;
+    timer = 0;
   }
 
   if (hits != lastHit)
