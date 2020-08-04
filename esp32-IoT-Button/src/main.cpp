@@ -10,10 +10,12 @@
 #include <ESP32Encoder.h>
 
 #define WAKEUP_PIN_BITMASK 0x100004000
-#define EEPROM_SIZE 1
-
+#define EEPROM_SIZE 2
+#define ORDER_MODE 0
+#define ACTION_MODE 1
 int mitarbeiterID = 0;
 int setupID;
+int mode = ORDER_MODE; 
 
 ESP32Encoder encoder;
 int lastCount = 0;
@@ -135,7 +137,9 @@ void initialSetup()
 const char *broker = "hivemq.dock.moxd.io";                         //Adresse des Brokers
 const char *inTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/list"; //Ein Topic
 const char *outTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/order/";
-
+const char *actions ="thkoeln/IoT/bmw/montage/mittelkonsole/actionList";
+const char *modeTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/mode";
+const char *actionOut = "thkoeln/IoT/bmw/montage/mittelkonsole/action/";
 void reconnect()
 {
   // Loop until we're reconnected
@@ -150,6 +154,8 @@ void reconnect()
     {
       Serial.println("connected");
       client.subscribe(inTopic);
+      client.subscribe(modeTopic);
+      client.subscribe(actions);
       if (mitarbeiterID == 255)
       {
         initialSetup();
@@ -194,7 +200,25 @@ void callback(char *topic, byte *payload, unsigned int length)
       mitarbeiterID = value;
     }
   }
-  else if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/list") == 0)
+ if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/mode") == 0)
+  {
+    char buffer[128];
+    memcpy(buffer, payload, length);
+    buffer[length] = '\0';
+    char *end = nullptr;
+    long value = strtol(buffer, &end, 10);
+    if (end == buffer || errno == ERANGE)
+      ; // Conversion error occurred
+    else
+    {
+      EEPROM.write(1, value);
+      EEPROM.commit();
+      mode = value;
+       Serial.println(" mode:");
+       Serial.println( mode);
+    } 
+  }
+  if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/list") == 0 &&   mode == ORDER_MODE)
   {
     for (int i = 0; i < length; i++)
     {
@@ -204,14 +228,27 @@ void callback(char *topic, byte *payload, unsigned int length)
     deserializeJson(doc, payload, length);
     Serial.println(doc[0]["name"].as<char *>());
     len = doc.size();
-    Serial.println(len);
     if (hits >= len)
       hits = len - 1;
   }
-  lastHit = -1;
-  timer = 0;
-  delay(500);
-}
+  else  if(strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/actionList")==0 && mode == ACTION_MODE)
+   {
+       for (int i = 0; i < length; i++)
+    {
+      Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
+    }
+    doc.clear();
+    deserializeJson(doc, payload, length);
+    Serial.println(doc[0]["actionName"].as<char *>());
+    len = doc.size();
+    if (hits >= len)
+      hits = len - 1;
+    }
+    lastHit = -1;
+    timer = 0;
+    delay(500);
+  } 
+
 
 void setup()
 {
@@ -252,7 +289,44 @@ void displaySuccess()
   lcd.write(4);
   delay(1500);
 }
-
+void callAction()
+{
+   lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(doc[hits]["actionName"].as<char *>());
+  lcd.setCursor(0,1);
+  lcd.print("Melden");
+  lcd.print("?");
+  delay(400);
+  int i = 0;
+  while (1)
+  {
+      switchState = digitalRead(switchPin);
+    if (switchState != prevSwitchState)
+    {
+      if (switchState == HIGH)
+      {
+        char buffer[256];
+        size_t n = serializeJson(doc[hits], buffer);
+        String out = actionOut;
+        out += String(mitarbeiterID);
+        const char *c = out.c_str();
+        client.publish_P(c, buffer, n);
+        bzero(buffer, n);
+        lastHit = -1;
+        displaySuccess();
+        break;
+      }
+    }
+    i++;
+    if (i == 8000)
+    {
+      lastHit = -1;
+      break;
+    }
+    delay(1);
+  }
+}
 void orderProduct()
 {
   lcd.clear();
@@ -291,6 +365,7 @@ void orderProduct()
     delay(1);
   }
 }
+
 
 void loop()
 {
@@ -336,9 +411,12 @@ void loop()
       timer = 0;
       delay(10);
     }
-
-    if (encoder.getCount() != lastCount && encoder.getCount() % 2 == 0)
+if(mode == ORDER_MODE)
+{
+        if (encoder.getCount() != lastCount && encoder.getCount() % 2 == 0)
     {
+      String name = doc[hits]["name"];
+      Serial.println(name);
       int currentQuantity = atoi(doc[hits]["quantity"]);
       int step = atoi(doc[hits]["step"]);
       char snum[5];
@@ -357,8 +435,7 @@ void loop()
       lastHit = -1;
       timer = 0;
     }
-
-    if (hits != lastHit)
+        if (hits != lastHit)
     {
       Serial.println(hits);
       lcd.clear();
@@ -376,18 +453,38 @@ void loop()
       lcd.print(len);
       lastHit = hits;
     }
+ }
+else
+{
+   if (hits != lastHit)
+    {
+      Serial.println(hits);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(doc[hits]["actionName"].as<char *>());
+      lcd.setCursor(13, 1);
+      lcd.print(hits + 1);
+      lcd.print("/");
+      lcd.print(len);
+      lastHit = hits;
+    } 
+}
 
-    switchState = digitalRead(switchPin);
+  switchState = digitalRead(switchPin);
     if (switchState != prevSwitchState)
     {
-      if (switchState == HIGH)
+      if (switchState == HIGH && mode == ORDER_MODE)
       {
         orderProduct();
         delay(10);
-      }
+      }else if(switchState == HIGH && mode == ACTION_MODE)
+      {
+        callAction();
+        delay(10);
+      } 
     }
     timer++;
-    if (timer == 8000)
+    if (timer == 30000)
     {
       lcd.setRGB(0, 0, 0);
       lcd.noDisplay();
@@ -398,3 +495,5 @@ void loop()
 
   delay(1);
 }
+
+    
