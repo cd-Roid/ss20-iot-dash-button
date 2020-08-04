@@ -6,6 +6,12 @@
 #include "credentials.h"
 #include "rgb_lcd.h"
 #include "paj7620.h"
+#include <ESP32Encoder.h>
+
+#define WAKEUP_PIN_BITMASK 0x100004000
+
+ESP32Encoder encoder;
+int lastCount = 0;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -18,7 +24,7 @@ int switchState = 0;
 int prevSwitchState = 0;
 int len = 0;
 int timer = 0;
-StaticJsonDocument<256> doc;
+DynamicJsonDocument doc(1024);
 
 byte customChar[] = {
     B00000,
@@ -30,9 +36,53 @@ byte customChar[] = {
     B01110,
     B00000};
 
+byte topLeftCheck[] = {
+    B00001,
+    B00011,
+    B00111,
+    B01111,
+    B11111,
+    B11111,
+    B11111,
+    B11111};
+
+byte topRightCheck[] = {
+    B10000,
+    B11000,
+    B11100,
+    B11110,
+    B11111,
+    B11111,
+    B11101,
+    B11101};
+
+byte bottomLeftCheck[] = {
+    B11111,
+    B11011,
+    B11101,
+    B11110,
+    B01111,
+    B00111,
+    B00011,
+    B00001};
+
+byte bottomRightCheck[] = {
+    B11011,
+    B10111,
+    B01111,
+    B11111,
+    B11110,
+    B11100,
+    B11000,
+    B10000};
+
 /*** Initales verbinden mit WLAN ***/
 void setupWifi()
 {
+  int counter = 0;
+  int retryCounter = 0;
+  lcd.setCursor(0, 0);
+  lcd.print("Connecting...");
   Serial.print("\nConnecting to");
   Serial.println(ssid);
 
@@ -40,8 +90,18 @@ void setupWifi()
 
   while (WiFi.status() != WL_CONNECTED)
   {
+    if (counter > 25)
+    {
+      retryCounter++;
+      WiFi.reconnect();
+      counter = 0;
+    }
     delay(100);
+    lcd.setCursor(0, 2);
+    lcd.print("Status ");
+    lcd.print(WiFi.status());
     Serial.println(WiFi.status());
+    counter++;
   }
 
   Serial.print("\nConnected to");
@@ -106,19 +166,39 @@ void callback(char *topic, byte *payload, unsigned int length)
 void setup()
 {
   Serial.begin(9600);
+  ESP32Encoder::useInternalWeakPullResistors = UP;
+  encoder.attachHalfQuad(14, 27);
+  encoder.setCount(0);
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 1);
+  esp_sleep_enable_ext1_wakeup(WAKEUP_PIN_BITMASK, ESP_EXT1_WAKEUP_ALL_LOW);
   timer = 0;
+  lcd.begin(16, 2);
+  lcd.setCursor(0, 0);
+  lcd.print("Welcome :)");
   setupWifi();
   client.setServer(broker, 1883);
   client.setCallback(callback);
 
-  lcd.begin(16, 2);
   pinMode(switchPin, INPUT);
 
-  lcd.setCursor(0, 0);
-  lcd.print("Welcome :)");
   lcd.createChar(0, customChar);
+  lcd.createChar(1, topLeftCheck);
+  lcd.createChar(2, topRightCheck);
+  lcd.createChar(3, bottomLeftCheck);
+  lcd.createChar(4, bottomRightCheck);
   paj7620Init();
+}
+
+void displaySuccess()
+{
+  lcd.clear();
+  lcd.setCursor(7, 0);
+  lcd.write(1);
+  lcd.write(2);
+  lcd.setCursor(7, 1);
+  lcd.write(3);
+  lcd.write(4);
+  delay(1500);
 }
 
 void orderProduct()
@@ -143,7 +223,7 @@ void orderProduct()
         client.publish_P(outTopic, buffer, n);
         bzero(buffer, n);
         lastHit = -1;
-        delay(400);
+        displaySuccess();
         break;
       }
     }
@@ -175,7 +255,7 @@ void loop()
       hits = hits + 1;
     else
       hits = 0;
-
+    timer = 0;
     delay(10);
   }
 
@@ -189,6 +269,27 @@ void loop()
     delay(10);
   }
 
+  if (encoder.getCount() != lastCount && encoder.getCount() % 2 == 0)
+  {
+    int currentQuantity = atoi(doc[hits]["quantity"]);
+    int step = atoi(doc[hits]["step"]);
+    char snum[5];
+    if (encoder.getCount() > lastCount)
+    {
+      currentQuantity += step;
+    }
+    else
+    {
+      if (currentQuantity - step > 0)
+        currentQuantity -= step;
+    }
+    itoa(currentQuantity, snum, 10);
+    doc[hits]["quantity"] = snum;
+    lastCount = encoder.getCount();
+    lastHit = -1;
+    timer = 0;
+  }
+
   if (hits != lastHit)
   {
     Serial.println(hits);
@@ -196,7 +297,7 @@ void loop()
     lcd.setCursor(0, 0);
     lcd.print(doc[hits]["name"].as<char *>());
     lcd.setCursor(0, 1);
-    String quantity = doc[hits]["quantitiy"].as<char *>();
+    String quantity = doc[hits]["quantity"].as<char *>();
     quantity += " St";
     lcd.print(quantity);
     lcd.write((unsigned char)0);
