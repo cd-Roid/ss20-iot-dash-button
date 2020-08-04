@@ -13,6 +13,7 @@
 #define EEPROM_SIZE 1
 
 int mitarbeiterID = 0;
+int setupID;
 
 ESP32Encoder encoder;
 int lastCount = 0;
@@ -112,11 +113,28 @@ void setupWifi()
   Serial.println(ssid);
 }
 
+void initialSetup()
+{
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Init Setup");
+  int initID = random(100);
+  setupID = initID;
+  char initIDString[8];
+  sprintf(initIDString, "%d", initID);
+  Serial.println("Intial Setup");
+  client.publish("thkoeln/IoT/setup", initIDString);
+  String in = "thkoeln/IoT/setup/";
+  in += String(initIDString);
+  Serial.println(in);
+  const char *c = in.c_str();
+  client.subscribe(c);
+}
+
 /*** Connenct/Reconnect to MQTT Broker in Case of Connection loss ***/
 const char *broker = "hivemq.dock.moxd.io";                         //Adresse des Brokers
 const char *inTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/list"; //Ein Topic
 const char *outTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/order/";
-const char *setupTopicIn = "thkoeln/IoT/setup/1";
 
 void reconnect()
 {
@@ -132,7 +150,10 @@ void reconnect()
     {
       Serial.println("connected");
       client.subscribe(inTopic);
-      client.subscribe(setupTopicIn);
+      if (mitarbeiterID == 255)
+      {
+        initialSetup();
+      }
     }
     else
     {
@@ -152,7 +173,10 @@ void callback(char *topic, byte *payload, unsigned int length)
   lcd.setCursor(0, 0);
   lcd.print("Updating...");
   Serial.println(topic);
-  if (strcmp(topic, "thkoeln/IoT/setup/1") == 0)
+  String setup = "thkoeln/IoT/setup/";
+  setup += String(setupID);
+  const char *c = setup.c_str();
+  if (strcmp(topic, c) == 0)
   {
     lcd.setCursor(0, 1);
     lcd.print((char)payload[0]);
@@ -172,8 +196,6 @@ void callback(char *topic, byte *payload, unsigned int length)
   }
   else if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/list") == 0)
   {
-    Serial.print("Received messages: ");
-    Serial.println(topic);
     for (int i = 0; i < length; i++)
     {
       Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
@@ -281,83 +303,98 @@ void loop()
   uint8_t data = 0; // Read Bank_0_Reg_0x43/0x44 for gesture result.
 
   paj7620ReadReg(0x43, 1, &data); // When different gestures be detected, the variable 'data' will be set to different values by paj7620ReadReg(0x43, 1, &data).
-
-  if (data == GES_UP_FLAG)
+  if (mitarbeiterID == 255)
   {
-    if (hits + 1 < len)
-      hits = hits + 1;
-    else
-      hits = 0;
-    timer = 0;
-    delay(10);
-  }
-
-  if (data == GES_DOWN_FLAG)
-  {
-    if (hits - 1 < 0)
-      hits = len - 1;
-    else
-      hits = hits - 1;
-    timer = 0;
-    delay(10);
-  }
-
-  if (encoder.getCount() != lastCount && encoder.getCount() % 2 == 0)
-  {
-    int currentQuantity = atoi(doc[hits]["quantity"]);
-    int step = atoi(doc[hits]["step"]);
-    char snum[5];
-    if (encoder.getCount() > lastCount)
+    if (hits != lastHit)
     {
-      currentQuantity += step;
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.println("Init Setup");
+      lcd.setCursor(0, 1);
+      lcd.print("Setup @ Web");
+      lastHit = hits;
     }
-    else
-    {
-      if (currentQuantity - step > 0)
-        currentQuantity -= step;
-    }
-    itoa(currentQuantity, snum, 10);
-    doc[hits]["quantity"] = snum;
-    lastCount = encoder.getCount();
-    lastHit = -1;
-    timer = 0;
   }
-
-  if (hits != lastHit)
+  else
   {
-    Serial.println(hits);
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print(doc[hits]["name"].as<char *>());
-    lcd.setCursor(0, 1);
-    String quantity = doc[hits]["quantity"].as<char *>();
-    quantity += " St";
-    lcd.print(quantity);
-    lcd.write((unsigned char)0);
-    lcd.print("ck");
-    lcd.setCursor(13, 1);
-    lcd.print(hits + 1);
-    lcd.print("/");
-    lcd.print(len);
-    lastHit = hits;
-  }
-
-  switchState = digitalRead(switchPin);
-  if (switchState != prevSwitchState)
-  {
-    if (switchState == HIGH)
+    if (data == GES_UP_FLAG)
     {
-      orderProduct();
+      if (hits + 1 < len)
+        hits = hits + 1;
+      else
+        hits = 0;
+      timer = 0;
       delay(10);
     }
+
+    if (data == GES_DOWN_FLAG)
+    {
+      if (hits - 1 < 0)
+        hits = len - 1;
+      else
+        hits = hits - 1;
+      timer = 0;
+      delay(10);
+    }
+
+    if (encoder.getCount() != lastCount && encoder.getCount() % 2 == 0)
+    {
+      int currentQuantity = atoi(doc[hits]["quantity"]);
+      int step = atoi(doc[hits]["step"]);
+      char snum[5];
+      if (encoder.getCount() > lastCount)
+      {
+        currentQuantity += step;
+      }
+      else
+      {
+        if (currentQuantity - step > 0)
+          currentQuantity -= step;
+      }
+      itoa(currentQuantity, snum, 10);
+      doc[hits]["quantity"] = snum;
+      lastCount = encoder.getCount();
+      lastHit = -1;
+      timer = 0;
+    }
+
+    if (hits != lastHit)
+    {
+      Serial.println(hits);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(doc[hits]["name"].as<char *>());
+      lcd.setCursor(0, 1);
+      String quantity = doc[hits]["quantity"].as<char *>();
+      quantity += " St";
+      lcd.print(quantity);
+      lcd.write((unsigned char)0);
+      lcd.print("ck");
+      lcd.setCursor(13, 1);
+      lcd.print(hits + 1);
+      lcd.print("/");
+      lcd.print(len);
+      lastHit = hits;
+    }
+
+    switchState = digitalRead(switchPin);
+    if (switchState != prevSwitchState)
+    {
+      if (switchState == HIGH)
+      {
+        orderProduct();
+        delay(10);
+      }
+    }
+    timer++;
+    if (timer == 8000)
+    {
+      lcd.setRGB(0, 0, 0);
+      lcd.noDisplay();
+      lastHit = -1;
+      esp_deep_sleep_start();
+    }
   }
-  timer++;
-  if (timer == 8000)
-  {
-    lcd.setRGB(0, 0, 0);
-    lcd.noDisplay();
-    lastHit = -1;
-    esp_deep_sleep_start();
-  }
+
   delay(1);
 }
