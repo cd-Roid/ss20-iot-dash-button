@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <EEPROM.h>
 #include <Wire.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
@@ -9,6 +10,9 @@
 #include <ESP32Encoder.h>
 
 #define WAKEUP_PIN_BITMASK 0x100004000
+#define EEPROM_SIZE 1
+
+int mitarbeiterID = 0;
 
 ESP32Encoder encoder;
 int lastCount = 0;
@@ -109,9 +113,10 @@ void setupWifi()
 }
 
 /*** Connenct/Reconnect to MQTT Broker in Case of Connection loss ***/
-const char *broker = "test.mosquitto.org";                          //Adresse des Brokers
+const char *broker = "hivemq.dock.moxd.io";                         //Adresse des Brokers
 const char *inTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/list"; //Ein Topic
-const char *outTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/order/1234";
+const char *outTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/order/";
+const char *setupTopicIn = "thkoeln/IoT/setup/1";
 
 void reconnect()
 {
@@ -127,6 +132,7 @@ void reconnect()
     {
       Serial.println("connected");
       client.subscribe(inTopic);
+      client.subscribe(setupTopicIn);
     }
     else
     {
@@ -145,19 +151,41 @@ void callback(char *topic, byte *payload, unsigned int length)
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Updating...");
-  Serial.print("Received messages: ");
   Serial.println(topic);
-  for (int i = 0; i < length; i++)
+  if (strcmp(topic, "thkoeln/IoT/setup/1") == 0)
   {
-    Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
+    lcd.setCursor(0, 1);
+    lcd.print((char)payload[0]);
+    char buffer[128];
+    memcpy(buffer, payload, length);
+    buffer[length] = '\0';
+    char *end = nullptr;
+    long value = strtol(buffer, &end, 10);
+    if (end == buffer || errno == ERANGE)
+      ; // Conversion error occurred
+    else
+    {
+      EEPROM.write(0, value);
+      EEPROM.commit();
+      mitarbeiterID = value;
+    }
   }
-  doc.clear();
-  deserializeJson(doc, payload, length);
-  Serial.println(doc[0]["name"].as<char *>());
-  len = doc.size();
-  Serial.println(len);
-  if (hits >= len)
-    hits = len - 1;
+  else if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/list") == 0)
+  {
+    Serial.print("Received messages: ");
+    Serial.println(topic);
+    for (int i = 0; i < length; i++)
+    {
+      Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
+    }
+    doc.clear();
+    deserializeJson(doc, payload, length);
+    Serial.println(doc[0]["name"].as<char *>());
+    len = doc.size();
+    Serial.println(len);
+    if (hits >= len)
+      hits = len - 1;
+  }
   lastHit = -1;
   timer = 0;
   delay(500);
@@ -172,6 +200,8 @@ void setup()
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 1);
   esp_sleep_enable_ext1_wakeup(WAKEUP_PIN_BITMASK, ESP_EXT1_WAKEUP_ALL_LOW);
   timer = 0;
+  EEPROM.begin(EEPROM_SIZE);
+  mitarbeiterID = EEPROM.read(0);
   lcd.begin(16, 2);
   lcd.setCursor(0, 0);
   lcd.print("Welcome :)");
@@ -220,7 +250,10 @@ void orderProduct()
       {
         char buffer[256];
         size_t n = serializeJson(doc[hits], buffer);
-        client.publish_P(outTopic, buffer, n);
+        String out = outTopic;
+        out += String(mitarbeiterID);
+        const char *c = out.c_str();
+        client.publish_P(c, buffer, n);
         bzero(buffer, n);
         lastHit = -1;
         displaySuccess();
