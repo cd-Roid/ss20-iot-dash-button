@@ -15,7 +15,7 @@
 #define ACTION_MODE 1
 int mitarbeiterID = 0;
 int setupID;
-int mode = ORDER_MODE; 
+int mode = ORDER_MODE;
 
 ESP32Encoder encoder;
 int lastCount = 0;
@@ -134,10 +134,10 @@ void initialSetup()
 }
 
 /*** Connenct/Reconnect to MQTT Broker in Case of Connection loss ***/
-const char *broker = "hivemq.dock.moxd.io";                         //Adresse des Brokers
-const char *inTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/list"; //Ein Topic
+const char *broker = "hivemq.dock.moxd.io";                           //Adresse des Brokers
+const char *orderList = "thkoeln/IoT/bmw/montage/mittelkonsole/list"; //Ein Topic
 const char *outTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/order/";
-const char *actions ="thkoeln/IoT/bmw/montage/mittelkonsole/actionList";
+const char *actions = "thkoeln/IoT/bmw/montage/mittelkonsole/actionList";
 const char *modeTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/mode";
 const char *actionOut = "thkoeln/IoT/bmw/montage/mittelkonsole/action/";
 void reconnect()
@@ -153,9 +153,7 @@ void reconnect()
     if (client.connect(clientId.c_str()))
     {
       Serial.println("connected");
-      client.subscribe(inTopic);
       client.subscribe(modeTopic);
-      client.subscribe(actions);
       if (mitarbeiterID == 255)
       {
         initialSetup();
@@ -200,7 +198,7 @@ void callback(char *topic, byte *payload, unsigned int length)
       mitarbeiterID = value;
     }
   }
- if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/mode") == 0)
+  if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/mode") == 0)
   {
     char buffer[128];
     memcpy(buffer, payload, length);
@@ -214,11 +212,21 @@ void callback(char *topic, byte *payload, unsigned int length)
       EEPROM.write(1, value);
       EEPROM.commit();
       mode = value;
-       Serial.println(" mode:");
-       Serial.println( mode);
-    } 
+      if (mode == ACTION_MODE)
+      {
+        client.subscribe(actions);
+        client.unsubscribe(orderList);
+      }
+      else if (mode == ORDER_MODE)
+      {
+        client.subscribe(orderList);
+        client.unsubscribe(actions);
+      }
+      Serial.println("mode: ");
+      Serial.println(mode);
+    }
   }
-  if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/list") == 0 &&   mode == ORDER_MODE)
+  if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/list") == 0 && mode == ORDER_MODE)
   {
     for (int i = 0; i < length; i++)
     {
@@ -231,24 +239,23 @@ void callback(char *topic, byte *payload, unsigned int length)
     if (hits >= len)
       hits = len - 1;
   }
-  else  if(strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/actionList")==0 && mode == ACTION_MODE)
-   {
-       for (int i = 0; i < length; i++)
+  else if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/actionList") == 0 && mode == ACTION_MODE)
+  {
+    for (int i = 0; i < length; i++)
     {
       Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
     }
     doc.clear();
     deserializeJson(doc, payload, length);
-    Serial.println(doc[0]["actionName"].as<char *>());
+    Serial.println(doc[0]["name"].as<char *>());
     len = doc.size();
     if (hits >= len)
       hits = len - 1;
-    }
-    lastHit = -1;
-    timer = 0;
-    delay(500);
-  } 
-
+  }
+  lastHit = -1;
+  timer = 0;
+  delay(500);
+}
 
 void setup()
 {
@@ -261,6 +268,7 @@ void setup()
   timer = 0;
   EEPROM.begin(EEPROM_SIZE);
   mitarbeiterID = EEPROM.read(0);
+  mode = EEPROM.read(1);
   lcd.begin(16, 2);
   lcd.setCursor(0, 0);
   lcd.print("Welcome :)");
@@ -291,17 +299,17 @@ void displaySuccess()
 }
 void callAction()
 {
-   lcd.clear();
+  lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print(doc[hits]["actionName"].as<char *>());
-  lcd.setCursor(0,1);
+  lcd.print(doc[hits]["name"].as<char *>());
+  lcd.setCursor(0, 1);
   lcd.print("Melden");
   lcd.print("?");
   delay(400);
   int i = 0;
   while (1)
   {
-      switchState = digitalRead(switchPin);
+    switchState = digitalRead(switchPin);
     if (switchState != prevSwitchState)
     {
       if (switchState == HIGH)
@@ -366,7 +374,6 @@ void orderProduct()
   }
 }
 
-
 void loop()
 {
 
@@ -411,77 +418,78 @@ void loop()
       timer = 0;
       delay(10);
     }
-if(mode == ORDER_MODE)
-{
-        if (encoder.getCount() != lastCount && encoder.getCount() % 2 == 0)
+    if (mode == ORDER_MODE)
     {
-      String name = doc[hits]["name"];
-      Serial.println(name);
-      int currentQuantity = atoi(doc[hits]["quantity"]);
-      int step = atoi(doc[hits]["step"]);
-      char snum[5];
-      if (encoder.getCount() > lastCount)
+      if (encoder.getCount() != lastCount && encoder.getCount() % 2 == 0)
       {
-        currentQuantity += step;
+        String name = doc[hits]["name"];
+        Serial.println(name);
+        int currentQuantity = atoi(doc[hits]["quantity"]);
+        int step = atoi(doc[hits]["step"]);
+        char snum[5];
+        if (encoder.getCount() > lastCount)
+        {
+          currentQuantity += step;
+        }
+        else
+        {
+          if (currentQuantity - step > 0)
+            currentQuantity -= step;
+        }
+        itoa(currentQuantity, snum, 10);
+        doc[hits]["quantity"] = snum;
+        lastCount = encoder.getCount();
+        lastHit = -1;
+        timer = 0;
       }
-      else
+      if (hits != lastHit)
       {
-        if (currentQuantity - step > 0)
-          currentQuantity -= step;
+        Serial.println(hits);
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print(doc[hits]["name"].as<char *>());
+        lcd.setCursor(0, 1);
+        String quantity = doc[hits]["quantity"].as<char *>();
+        quantity += " St";
+        lcd.print(quantity);
+        lcd.write((unsigned char)0);
+        lcd.print("ck");
+        lcd.setCursor(13, 1);
+        lcd.print(hits + 1);
+        lcd.print("/");
+        lcd.print(len);
+        lastHit = hits;
       }
-      itoa(currentQuantity, snum, 10);
-      doc[hits]["quantity"] = snum;
-      lastCount = encoder.getCount();
-      lastHit = -1;
-      timer = 0;
     }
-        if (hits != lastHit)
+    else
     {
-      Serial.println(hits);
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print(doc[hits]["name"].as<char *>());
-      lcd.setCursor(0, 1);
-      String quantity = doc[hits]["quantity"].as<char *>();
-      quantity += " St";
-      lcd.print(quantity);
-      lcd.write((unsigned char)0);
-      lcd.print("ck");
-      lcd.setCursor(13, 1);
-      lcd.print(hits + 1);
-      lcd.print("/");
-      lcd.print(len);
-      lastHit = hits;
+      if (hits != lastHit)
+      {
+        Serial.println(hits);
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print(doc[hits]["name"].as<char *>());
+        lcd.setCursor(13, 1);
+        lcd.print(hits + 1);
+        lcd.print("/");
+        lcd.print(len);
+        lastHit = hits;
+      }
     }
- }
-else
-{
-   if (hits != lastHit)
-    {
-      Serial.println(hits);
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print(doc[hits]["actionName"].as<char *>());
-      lcd.setCursor(13, 1);
-      lcd.print(hits + 1);
-      lcd.print("/");
-      lcd.print(len);
-      lastHit = hits;
-    } 
-}
 
-  switchState = digitalRead(switchPin);
+    switchState = digitalRead(switchPin);
     if (switchState != prevSwitchState)
     {
       if (switchState == HIGH && mode == ORDER_MODE)
       {
         orderProduct();
         delay(10);
-      }else if(switchState == HIGH && mode == ACTION_MODE)
+      }
+      else if (switchState == HIGH && mode == ACTION_MODE)
       {
         callAction();
         delay(10);
-      } 
+      }
     }
     timer++;
     if (timer == 30000)
@@ -495,5 +503,3 @@ else
 
   delay(1);
 }
-
-    
