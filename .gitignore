@@ -110,3 +110,5 @@ dist
 .vscode/ipch
 src/credentials.h
 
+esp32-IoT-Button/.vscode/extensions.json
+.DS_Store
