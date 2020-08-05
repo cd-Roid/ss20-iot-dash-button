@@ -1,6 +1,6 @@
 const app = require("express")();
 var http = require("http").createServer(app);
-//const Mongoose = require('mongoose');
+const Mongoose = require('mongoose');
 const io = require("socket.io")(http);
 const mqtt = require("mqtt");
 let productList = [];
@@ -8,6 +8,11 @@ let actionOrder = [];
 let orderedProduct = [];
 
 var client = mqtt.connect("mqtt://hivemq.dock.moxd.io");
+Mongoose.connect("mongodb+srv//iot-admin:iot-password@cluster0.d2vsw.mongodb.net/iot-db?retryWrites=true&w=majority", { useUnifiedTopology: true, useNewUrlParser: true })
+  .catch((err) => console.error(err));
+const db = Mongoose.connection
+db.on('error', (err) => console.error(err));
+db.once('open', () => console.log('Connected to db'));
 
 client.on("connect", function () {
   client.subscribe("mittelkonsole/order/+", function (err) {
@@ -61,7 +66,7 @@ client.on("message", function (topic, message) {
   }
 });
 
-client.on("message", function(topic, message) {
+/*client.on("message", function(topic, message) {
   if(message.length!=0){
     if(topic == "thkoeln/IoT/bmw/montage/mittelkonsole/list"){
       console.log("Topic:"+topic +",Message:"+ message );
@@ -70,7 +75,7 @@ client.on("message", function(topic, message) {
     }
   }
 })
-
+*/
 
 
 app.get("/", (req, res) => {
