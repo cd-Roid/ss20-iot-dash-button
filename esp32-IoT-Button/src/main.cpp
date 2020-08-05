@@ -136,7 +136,7 @@ void initialSetup()
 /*** Connenct/Reconnect to MQTT Broker in Case of Connection loss ***/
 const char *broker = "hivemq.dock.moxd.io";                           //Adresse des Brokers
 const char *orderList = "thkoeln/IoT/bmw/montage/mittelkonsole/list"; //Ein Topic
-const char *outTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/order/";
+const char *outTopic = "mittelkonsole/order/";
 const char *actions = "thkoeln/IoT/bmw/montage/mittelkonsole/actionList";
 const char *modeTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/mode";
 const char *actionOut = "thkoeln/IoT/bmw/montage/mittelkonsole/action/";
@@ -314,7 +314,7 @@ void callAction()
     {
       if (switchState == HIGH)
       {
-        char buffer[256];
+        char buffer[1024];
         size_t n = serializeJson(doc[hits], buffer);
         String out = actionOut;
         out += String(mitarbeiterID);
@@ -352,7 +352,7 @@ void orderProduct()
     {
       if (switchState == HIGH)
       {
-        char buffer[256];
+        char buffer[1024];
         size_t n = serializeJson(doc[hits], buffer);
         String out = outTopic;
         out += String(mitarbeiterID);
