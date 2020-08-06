@@ -141,16 +141,20 @@ client.on('message', async function (topic, message) {
       io.emit('orderedProduct', newOrder);
     }
     else if (topic == "thkoeln/IoT/setup") {
-      let newID = new setupID({ SetupId: computedMessage });
-      setupMessage = setupID;
-      await newID.save((err) => {
-        if (err) {
-          console.error(err);
-        } else {
-          console.log(`Saved ${newID} to db!`);
-        }
-      });
-      io.emit('setupID', computedMessage);
+      let device = await setupID.findOne({SetupId: computedMessage})
+      if (device) {
+        io.emit('setupID', device);
+      } else {
+        let newID = new setupID({ SetupId: computedMessage });
+        await newID.save((err) => {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log(`Saved ${newID} to db!`);
+          }
+        });
+        io.emit('setupID', newID);
+      }
     }
   }
 });
@@ -159,24 +163,10 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-app.get("/setup", (req, res) => {
-  try {
-    res.send(setupMessage);
-  } catch (error) {
-    res.status(500).json({ message: error });
-  }
-});
-
-app.post("/setup", (req, res) => {
-  try {
-    let randomID = setupMessage;
-    let eID = req.body.eID;
-    client.publish("thkoeln/IoT/setup/" + randomID, eID,
-      () => { console.log("Published id to new Device."); });
-    res.send({ message: "Device now registered under:" + eID });
-  } catch (error) {
-    res.status(500).json({ message: error });
-  }
+app.get("/devices", async (req, res) => {
+  let newDevices = await setupID.find({});
+  console.log(newDevices);
+  res.send(newDevices);
 });
 
 app.get('/orders', async (req, res) => {
@@ -205,6 +195,7 @@ app.get('/actions', async (req, res) => {
 
 io.on('connection', (socket) => {
   console.log('a user connected');
+
   socket.on('newProduct', (msg) => {
     list.push(msg);
     client.publish(
@@ -214,6 +205,7 @@ io.on('connection', (socket) => {
     );
     console.log('message: ' + msg);
   });
+
   socket.on('mode_change', (msg) => {
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/mode',
@@ -222,7 +214,7 @@ io.on('connection', (socket) => {
     );
     console.log('message: ' + msg);
   });
-  io.emit('productList', list);
+
 });
 
 http.listen(3000, () => {
