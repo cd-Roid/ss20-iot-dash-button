@@ -3,7 +3,7 @@ export default {
     state.orders = orders;
   },
   addOrder(state, order) {
-    state.orders.push(order);
+    state.orders.unshift(order);
   },
   setOrderList(state, list) {
     state.orderList = list;

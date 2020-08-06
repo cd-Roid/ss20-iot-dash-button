@@ -4,7 +4,7 @@
       <b-card-title>{{ order.name }}</b-card-title>
       <b-card-text>
         <p>Anzahl: {{ order.quantity }}</p>
-        <p>Mitarbeiter: {{ order.eID }}</p>
+        <p>Mitarbeiter: {{ order.employee }}</p>
       </b-card-text>
         <b-button
           href="#"
