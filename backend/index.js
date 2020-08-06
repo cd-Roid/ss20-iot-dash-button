@@ -58,7 +58,12 @@ client.on('message', async function (topic, message) {
   // message is Buffer
   //console.log(message.length);
   if (message.length) {
-    let computedMessage = JSON.parse(message.toString());
+    let computedMessage = message.toString();
+    try {
+      computedMessage = JSON.parse(message.toString());
+    } catch(err) {
+      console.log(err)
+    }
     console.log('Message:' + message.toString());
     if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/list') {
       let newList = (list = new productList({ list: computedMessage }));
@@ -136,8 +141,7 @@ client.on('message', async function (topic, message) {
       io.emit('orderedProduct', newOrder);
     }
     else if (topic == "thkoeln/IoT/setup") {
-      let setup = JSON.parse(message);
-      let newID = new setupID({ SetupId: setup });
+      let newID = new setupID({ SetupId: computedMessage });
       setupMessage = setupID;
       await newID.save((err) => {
         if (err) {
@@ -146,7 +150,7 @@ client.on('message', async function (topic, message) {
           console.log(`Saved ${newID} to db!`);
         }
       });
-      io.emit('setupID', setup);
+      io.emit('setupID', computedMessage);
     }
   }
 });
