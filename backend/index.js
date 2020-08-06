@@ -132,6 +132,12 @@ app.get('/orders', async (req, res) => {
   res.send(currentOrders);
 });
 
+app.get('/orderList', async (req, res) => {
+  let currentOrders = await productList.findOne({});
+  console.log(currentOrders);
+  res.send(currentOrders);
+});
+
 io.on('connection', (socket) => {
   console.log('a user connected');
   socket.on('newProduct', (msg) => {

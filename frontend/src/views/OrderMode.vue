@@ -5,7 +5,7 @@
         <OrderList />
       </b-col>
       <b-col class="sidebar">
-        <h2>Possible Orders</h2>
+        <PossibleOrder />
       </b-col>
     </b-row>
   </b-container>
@@ -13,11 +13,13 @@
 
 <script>
 import OrderList from '@/components/OrderList.vue';
+import PossibleOrder from '@/components/possibleOrders.vue';
 
 export default {
   name: 'OrderView',
   components: {
     OrderList,
+    PossibleOrder,
   },
   created() {
     this.$socket.emit('mode_change', 0);

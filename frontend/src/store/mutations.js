@@ -5,4 +5,7 @@ export default {
   addOrder(state, order) {
     state.orders.push(order);
   },
+  setOrderList(state, list) {
+    state.orderList = list;
+  },
 };
