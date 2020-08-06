@@ -3,12 +3,15 @@ var http = require("http").createServer(app);
 const Mongoose = require('mongoose');
 const io = require("socket.io")(http);
 const mqtt = require("mqtt");
-let productList = [];
+const Actions = require("./Models/actionModel");
+const Employee = require("./Models/employeeModel");
+//const Product = require("./Models/ProductModel");
+const productList = require("./Models/productListModel");
 let actionOrder = [];
 let orderedProduct = [];
 
 var client = mqtt.connect("mqtt://hivemq.dock.moxd.io");
-Mongoose.connect("mongodb+srv//iot-admin:iot-password@cluster0.d2vsw.mongodb.net/iot-db?retryWrites=true&w=majority", { useUnifiedTopology: true, useNewUrlParser: true })
+Mongoose.connect("mongodb+srv://iot-admin:iot-password@cluster0.d2vsw.mongodb.net/IOT-DB?retryWrites=true&w=majority", { useUnifiedTopology: true, useNewUrlParser: true })
   .catch((err) => console.error(err));
 const db = Mongoose.connection
 db.on('error', (err) => console.error(err));
@@ -41,14 +44,25 @@ client.on("connect", function () {
   });
 });
 
-client.on("message", function (topic, message) {
+client.on("message", async function (topic, message) {
   // message is Buffer
-  console.log(message.length);
+  //console.log(message.length);
   if (message.length) {
     let computedMessage = JSON.parse(message.toString());
-    console.log(topic);
     console.log("Message:" + message.toString());
     if (topic == "thkoeln/IoT/bmw/montage/mittelkonsole/list") {
+      const newList = new productList({ list: computedMessage });
+      let collectionSize = await Mongoose.connection.collection('products').countDocuments();
+      if (collectionSize == 0) {
+        newList.save(function (err) {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log(`Saved ${newList} to db!`);
+          }
+        });
+      }
+      
       io.emit("productList", computedMessage);
     } else if (topic == "thkoeln/IoT/bmw/montage/mittelkonsole/actionList") {
       io.emit("actionList", computedMessage);
