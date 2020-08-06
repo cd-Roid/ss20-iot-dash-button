@@ -143,6 +143,14 @@ io.on('connection', (socket) => {
     );
     console.log('message: ' + msg);
   });
+  socket.on('mode_change', (msg) => {
+    client.publish(
+      'thkoeln/IoT/bmw/montage/mittelkonsole/mode',
+      msg.toString(),
+      { retain: true },
+    );
+    console.log('message: ' + msg);
+  });
   io.emit('productList', list);
 });
 
