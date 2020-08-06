@@ -1,16 +1,20 @@
 <template>
   <div id="app">
     <Header />
-    <router-view/>
+    <router-view />
+    <SetupModal />
   </div>
 </template>
 
 <script>
 import Header from '@/components/Header.vue';
+import SetupModal from '@/components/setupModal.vue';
 
 export default {
+  name: 'App',
   components: {
     Header,
+    SetupModal,
   },
 };
 </script>

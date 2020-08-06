@@ -8,4 +8,10 @@ export default {
   setOrderList(state, list) {
     state.orderList = list;
   },
+  setNewDevices(state, devices) {
+    state.newDevices = devices;
+  },
+  addDevice(state, device) {
+    state.newDevices.push(device);
+  },
 };
