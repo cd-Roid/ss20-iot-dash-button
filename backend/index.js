@@ -100,9 +100,13 @@ client.on('message', async function (topic, message) {
       actionOrder.push(computedMessage);
       io.emit('orderedAction', computedMessage);
     } else if (topic.startsWith('mittelkonsole/order/')) {
-      let id = topic.split("/");
-      id = id[id.length-1];
-      let newOrder = new Orders({name: computedMessage.name, quantity: computedMessage.quantity, eID: id});
+      let id = topic.split('/');
+      id = id[id.length - 1];
+      let newOrder = new Orders({
+        name: computedMessage.name,
+        quantity: computedMessage.quantity,
+        eID: id,
+      });
       await newOrder.save((err) => {
         if (err) {
           console.error(err);
@@ -117,6 +121,12 @@ client.on('message', async function (topic, message) {
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
+});
+
+app.get('/orders', async (req, res) => {
+  let currentOrders = await Orders.find({});
+  console.log(currentOrders);
+  res.send(currentOrders);
 });
 
 io.on('connection', (socket) => {
