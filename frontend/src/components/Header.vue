@@ -1,0 +1,23 @@
+<template>
+  <div>
+    <b-navbar variant="info" type="dark">
+      <b-navbar-brand href="/">IoT Button</b-navbar-brand>
+      <b-navbar-nav class="ml-auto">
+        <b-nav-item to="/">Order Mode
+        </b-nav-item>
+        <b-nav-item to="/action">Action Mode
+        </b-nav-item>
+      </b-navbar-nav>
+    </b-navbar>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'Header',
+};
+</script>
+
+<style>
+
+</style>
