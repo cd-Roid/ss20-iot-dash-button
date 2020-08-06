@@ -4,8 +4,9 @@ const ActionModel = new Mongoose.Schema(
     {
         list: {
             type: Object,
-            required: true
+            required: true,
         }
+
     }
 )
 
