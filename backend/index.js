@@ -4,10 +4,10 @@ const Mongoose = require('mongoose');
 const io = require("socket.io")(http);
 const mqtt = require("mqtt");
 const Actions = require("./Models/actionModel");
-const Employee = require("./Models/employeeModel");
-//const Product = require("./Models/ProductModel");
+const Mode = require("./Models/modeModel");
 const productList = require("./Models/productListModel");
 let actionOrder = [];
+let list = [];
 let orderedProduct = [];
 
 var client = mqtt.connect("mqtt://hivemq.dock.moxd.io");
@@ -51,10 +51,10 @@ client.on("message", async function (topic, message) {
     let computedMessage = JSON.parse(message.toString());
     console.log("Message:" + message.toString());
     if (topic == "thkoeln/IoT/bmw/montage/mittelkonsole/list") {
-      const newList = new productList({ list: computedMessage });
+      let newList = list = new productList({ list: computedMessage });
       let collectionSize = await Mongoose.connection.collection('products').countDocuments();
       if (collectionSize == 0) {
-        newList.save(function (err) {
+        await newList.save(function (err) {
           if (err) {
             console.error(err);
           } else {
@@ -62,35 +62,65 @@ client.on("message", async function (topic, message) {
           }
         });
       }
-      
       io.emit("productList", computedMessage);
+
     } else if (topic == "thkoeln/IoT/bmw/montage/mittelkonsole/actionList") {
+      let actionSize = await Mongoose.connection.collection('actions').countDocuments();
+      if (actionSize == 0) {
+        const newActions = new Actions({ list: computedMessage })
+        await newActions.save(
+          (err) => {
+            if (err) {
+              console.error(err);
+            } else {
+              console.log(`Saved ${newActions} to db!`);
+            }
+          });
+      }
       io.emit("actionList", computedMessage);
-    } else if (topic == "thkoeln/IoT/bmw/montage/mittelkonsole/mode'") {
-      io.emit("mode", computedMessage);
-    } else if (
-      topic.startsWith("thkoeln/IoT/bmw/montage/mittelkonsole/action/")
-    ) {
-      actionOrder.push(computedMessage);
-      io.emit("orderedAction", computedMessage);
-    } else if (topic.startsWith("mittelkonsole/order/")) {
-      orderedProduct.push(computedMessage);
-      io.emit("orderedProduct", orderedProduct);
+
+    } else if (topic == "thkoeln/IoT/bmw/montage/mittelkonsole/mode") {
+      let mode = new Mode({ mode: computedMessage });
+      let modeSize = await Mongoose.connection.collection('modes').countDocuments();
+      if (modeSize == 0) {
+        await mode.save((err) => {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log(`Saved ${mode} to db!`);
+          }
+        });
+      } else {
+        let toChange = await Mode.find({ _id: "5f2b5ae37307f14426c5049c" });
+        if (toChange) {
+          let obj = toChange[0];
+          obj.mode = computedMessage;
+          obj.save(
+            (err) => {
+              if (err) {
+                console.error(err);
+              } else {
+                console.log(`Saved ${mode} to db!`);
+              }
+            }
+          );
+        }
+
+      }
     }
+    io.emit("mode", computedMessage);
+  } else if (
+    topic.startsWith("thkoeln/IoT/bmw/montage/mittelkonsole/action/")
+  ) {
+    actionOrder.push(computedMessage);
+    io.emit("orderedAction", computedMessage);
+
+  } else if (topic.startsWith("mittelkonsole/order/")) {
+    orderedProduct.push(computedMessage);
+    io.emit("orderedProduct", orderedProduct);
   }
+
 });
-
-/*client.on("message", function(topic, message) {
-  if(message.length!=0){
-    if(topic == "thkoeln/IoT/bmw/montage/mittelkonsole/list"){
-      console.log("Topic:"+topic +",Message:"+ message );
-      client.publish(topic,message);
-      io.emit("AddedProduct", message);
-    }
-  }
-})
-*/
-
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
@@ -99,15 +129,15 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("newProduct", (msg) => {
-    productList.push(msg);
+    list.push(msg);
     client.publish(
       "thkoeln/IoT/bmw/montage/mittelkonsole/list",
-      JSON.stringify(productList),
+      JSON.stringify(list),
       { retain: true }
     );
-    console.log(msg);
+    console.log("message: " + msg);
   });
-  io.emit("productList", productList);
+  io.emit("productList", list);
 });
 
 http.listen(3000, () => {
