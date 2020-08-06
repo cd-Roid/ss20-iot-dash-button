@@ -3,9 +3,12 @@ var http = require('http').createServer(app);
 const Mongoose = require('mongoose');
 const io = require('socket.io')(http);
 const mqtt = require('mqtt');
+
 const Actions = require('./Models/actionModel');
 const Mode = require('./Models/modeModel');
 const productList = require('./Models/productListModel');
+const Orders = require('./Models/orderModel.js');
+
 let actionOrder = [];
 let list = [];
 let orderedProduct = [];
@@ -55,8 +58,7 @@ client.on('message', async function (topic, message) {
     if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/list') {
       let newList = (list = new productList({ list: computedMessage }));
       productList.remove({}, (err) => {
-        if (err)
-          throw err;
+        if (err) throw err;
       });
       await newList.save(function (err) {
         if (err) {
@@ -68,8 +70,7 @@ client.on('message', async function (topic, message) {
       io.emit('productList', computedMessage);
     } else if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/actionList') {
       Actions.remove({}, (err) => {
-        if (err)
-          throw err;
+        if (err) throw err;
       });
       const newActions = new Actions({ list: computedMessage });
       await newActions.save((err) => {
@@ -83,8 +84,7 @@ client.on('message', async function (topic, message) {
     } else if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/mode') {
       let newMode = new Mode({ mode: computedMessage });
       Mode.remove({}, (err) => {
-        if (err)
-          throw err;
+        if (err) throw err;
       });
       await newMode.save((err) => {
         if (err) {
@@ -100,8 +100,17 @@ client.on('message', async function (topic, message) {
       actionOrder.push(computedMessage);
       io.emit('orderedAction', computedMessage);
     } else if (topic.startsWith('mittelkonsole/order/')) {
-      orderedProduct.push(computedMessage);
-      io.emit('orderedProduct', orderedProduct);
+      let id = topic.split("/");
+      id = id[id.length-1];
+      let newOrder = new Orders({name: computedMessage.name, quantity: computedMessage.quantity, eID: id});
+      await newOrder.save((err) => {
+        if (err) {
+          console.error(err);
+        } else {
+          console.log(`Saved ${newOrder} to db!`);
+        }
+      });
+      io.emit('orderedProduct', newOrder);
     }
   }
 });
