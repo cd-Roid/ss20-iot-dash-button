@@ -1,7 +1,14 @@
 <template>
-  <b-jumbotron header="BootstrapVue" lead="Bootstrap v4 Components for Vue.js 2">
-    <OrderList />
-  </b-jumbotron>
+  <b-container fluid class="h100">
+    <b-row align-v="stretch">
+      <b-col cols="9">
+        <OrderList />
+      </b-col>
+      <b-col class="sidebar">
+        <h2>Possible Orders</h2>
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script>
@@ -18,4 +25,12 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped lang="scss">
+  .sidebar {
+    background: #eee;
+  }
+
+  .main {
+    min-height: 100%;
+  }
+</style>

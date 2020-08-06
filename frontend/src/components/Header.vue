@@ -19,5 +19,7 @@ export default {
 </script>
 
 <style>
-
+  .router-link-exact-active {
+    color: #fff !important;
+  }
 </style>
