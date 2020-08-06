@@ -10,4 +10,7 @@ export default {
 
     commit('setOrders', paintings);
   },
+  SOCKET_orderedProduct({ commit }, order) {
+    commit('addOrder', order);
+  },
 };
