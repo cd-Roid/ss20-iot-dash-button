@@ -1,6 +1,6 @@
 const app = require('express')();
 var cors = require('cors')
-app.use(cors);
+app.use(cors());
 
 var http = require('http').createServer(app);
 const Mongoose = require('mongoose');
