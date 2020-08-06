@@ -12,7 +12,7 @@ let orderedProduct = [];
 
 var client = mqtt.connect('mqtt://hivemq.dock.moxd.io');
 Mongoose.connect(
-  'mongodb+srv://iot-admin:iot-password@cluster0.d2vsw.mongodb.net/IOT-DB?retryWrites=true&w=majority',
+  'mongodb+srv://IoT-admin:L7gmpz1U6wVPX4f9@iot.fyxl1.mongodb.net/IOT-DB?retryWrites=true&w=majority',
   { useUnifiedTopology: true, useNewUrlParser: true },
 ).catch((err) => console.error(err));
 const db = Mongoose.connection;
@@ -54,61 +54,45 @@ client.on('message', async function (topic, message) {
     console.log('Message:' + message.toString());
     if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/list') {
       let newList = (list = new productList({ list: computedMessage }));
-      let collectionSize = await Mongoose.connection
-        .collection('products')
-        .countDocuments();
-      if (collectionSize == 0) {
-        await newList.save(function (err) {
-          if (err) {
-            console.error(err);
-          } else {
-            console.log(`Saved ${newList} to db!`);
-          }
-        });
-      }
+      productList.remove({}, (err) => {
+        if (err)
+          throw err;
+      });
+      await newList.save(function (err) {
+        if (err) {
+          console.error(err);
+        } else {
+          console.log(`Saved ${newList} to db!`);
+        }
+      });
       io.emit('productList', computedMessage);
     } else if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/actionList') {
-      let actionSize = await Mongoose.connection
-        .collection('actions')
-        .countDocuments();
-      if (actionSize == 0) {
-        const newActions = new Actions({ list: computedMessage });
-        await newActions.save((err) => {
-          if (err) {
-            console.error(err);
-          } else {
-            console.log(`Saved ${newActions} to db!`);
-          }
-        });
-      }
+      Actions.remove({}, (err) => {
+        if (err)
+          throw err;
+      });
+      const newActions = new Actions({ list: computedMessage });
+      await newActions.save((err) => {
+        if (err) {
+          console.error(err);
+        } else {
+          console.log(`Saved ${newActions} to db!`);
+        }
+      });
       io.emit('actionList', computedMessage);
     } else if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/mode') {
-      let mode = new Mode({ mode: computedMessage });
-      let modeSize = await Mongoose.connection
-        .collection('modes')
-        .countDocuments();
-      if (modeSize == 0) {
-        await mode.save((err) => {
-          if (err) {
-            console.error(err);
-          } else {
-            console.log(`Saved ${mode} to db!`);
-          }
-        });
-      } else {
-        let toChange = await Mode.find({ _id: '5f2b5ae37307f14426c5049c' });
-        if (toChange) {
-          let obj = toChange[0];
-          obj.mode = computedMessage;
-          obj.save((err) => {
-            if (err) {
-              console.error(err);
-            } else {
-              console.log(`Saved ${mode} to db!`);
-            }
-          });
+      let newMode = new Mode({ mode: computedMessage });
+      Mode.remove({}, (err) => {
+        if (err)
+          throw err;
+      });
+      await newMode.save((err) => {
+        if (err) {
+          console.error(err);
+        } else {
+          console.log(`Saved ${newMode} to db!`);
         }
-      }
+      });
       io.emit('mode', computedMessage);
     } else if (
       topic.startsWith('thkoeln/IoT/bmw/montage/mittelkonsole/action/')
