@@ -41,4 +41,7 @@ export default {
   SOCKET_setupID({ commit }, device) {
     commit('addDevice', device);
   },
+  removeDevice({ commit }, index) {
+    commit('deleteDevice', index);
+  },
 };

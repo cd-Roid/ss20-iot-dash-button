@@ -7,15 +7,16 @@ const Mongoose = require('mongoose');
 const io = require('socket.io')(http);
 const mqtt = require('mqtt');
 require("dotenv").config();
+
 const OrderedActions = require("./Models/orderedActionModel");
 const Actions = require('./Models/actionModel');
 const Mode = require('./Models/modeModel');
 const productList = require('./Models/productListModel');
 const Orders = require('./Models/orderModel.js');
 const setupID = require("./Models/setupIDModel");
+const Employee = require("./Models/employeeModel")
 
 let list = [];
-let setupMessage = 0;
 
 var client = mqtt.connect('mqtt://hivemq.dock.moxd.io');
 Mongoose.connect(
@@ -169,6 +170,12 @@ app.get("/devices", async (req, res) => {
   res.send(newDevices);
 });
 
+app.get("/users", async (req, res) => {
+  let users = await Employee.find({});
+  console.log(users);
+  res.send(users);
+});
+
 app.get('/orders', async (req, res) => {
   let currentOrders = await Orders.find({});
   console.log(currentOrders);
@@ -210,6 +217,18 @@ io.on('connection', (socket) => {
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/mode',
       msg.toString(),
+      { retain: true },
+    );
+    console.log('message: ' + msg);
+  });
+
+  socket.on('setupDevice', async (msg) => {
+    const newEmployee = new Employee({name: msg.name, eID: msg.eID});
+    await newEmployee.save();
+    await setupID.deleteOne({SetupId: msg.setupID});
+    client.publish(
+      'thkoeln/IoT/setup/'+msg.setupID,
+      msg.eID.toString(),
       { retain: true },
     );
     console.log('message: ' + msg);

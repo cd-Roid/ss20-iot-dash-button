@@ -14,4 +14,7 @@ export default {
   addDevice(state, device) {
     state.newDevices.push(device);
   },
+  deleteDevice(state, index) {
+    state.newDevices.splice(index, 1);
+  },
 };

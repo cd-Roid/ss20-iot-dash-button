@@ -1,18 +1,40 @@
 <template>
-  <b-modal hide-footer v-model="showModal" title="Seminar buchen">
-    <div class="overflow-auto">
+  <b-modal hide-footer v-model="showModal" title="Setup Devices">
+    <div>
       <b-row
         :current-page="currentPage"
         :per-page="1">
-        <b-col v-for="device in paginatedItems" :key="device._id">
+        <b-col v-for="(device, index) in paginatedItems" :key="device._id">
           <b-card
             text-variant="dark"
-            :header="device.SetupId"
-            class="text-center"
+            :header="`Device ${index+1}`"
             >
             <p class="card-text">
               {{device.SetupId}}
             </p>
+            <form @submit.prevent="setupDevice(device, index)">
+              <div class="form-group">
+                <label for="name">Name</label>
+                <input
+                  type="text"
+                  v-model="name"
+                  name="name"
+                  class="form-control"
+                />
+                <label for="eID">Mitarbeiter Nummer (0-255)</label>
+                <input
+                  type="text"
+                  v-model="eID"
+                  name="eID"
+                  class="form-control"
+                />
+              </div>
+              <div class="form-group">
+                <button class="btn btn-primary">
+                  Setup
+                </button>
+              </div>
+            </form>
           </b-card>
         </b-col>
       </b-row>
@@ -39,6 +61,8 @@ export default {
       pageNumber: 0,
       pageSize: 0,
       showModal: false,
+      name: '',
+      eID: '',
     };
   },
   computed: {
@@ -58,7 +82,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['loadNewDevices']),
+    ...mapActions(['loadNewDevices', 'removeDevice']),
     paginate(pageSize, pageNumber) {
       console.log(pageSize, pageNumber);
       this.pageNumber = pageNumber;
@@ -66,6 +90,12 @@ export default {
     },
     onPageChanged(page) {
       this.paginate(1, page - 1);
+    },
+    setupDevice(device, index) {
+      this.$socket.emit('setupDevice', { name: this.name, eID: this.eID, setupID: device.SetupId });
+      this.removeDevice(index);
+      this.name = '';
+      this.eID = '';
     },
   },
   mounted() {
@@ -78,5 +108,7 @@ export default {
 </script>
 
 <style>
-
+.card {
+  margin-bottom: 10px;
+}
 </style>
