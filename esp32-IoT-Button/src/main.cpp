@@ -14,7 +14,6 @@
 #define ORDER_MODE 0
 #define ACTION_MODE 1
 int mitarbeiterID = 0;
-int setupID;
 int mode = ORDER_MODE;
 
 ESP32Encoder encoder;
@@ -120,14 +119,10 @@ void initialSetup()
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Init Setup");
-  int initID = random(100);
-  setupID = initID;
-  char initIDString[8];
-  sprintf(initIDString, "%d", initID);
   Serial.println("Intial Setup");
-  client.publish("thkoeln/IoT/setup", initIDString);
+  client.publish("thkoeln/IoT/setup", WiFi.macAddress().c_str());
   String in = "thkoeln/IoT/setup/";
-  in += String(initIDString);
+  in += WiFi.macAddress();
   Serial.println(in);
   const char *c = in.c_str();
   client.subscribe(c);
@@ -178,7 +173,8 @@ void callback(char *topic, byte *payload, unsigned int length)
   lcd.print("Updating...");
   Serial.println(topic);
   String setup = "thkoeln/IoT/setup/";
-  setup += String(setupID);
+  setup += WiFi.macAddress();
+  Serial.println(setup);
   const char *c = setup.c_str();
   if (strcmp(topic, c) == 0)
   {
