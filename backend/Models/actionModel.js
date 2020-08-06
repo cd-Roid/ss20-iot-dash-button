@@ -2,8 +2,8 @@ const Mongoose = require('mongoose');
 
 const ActionModel = new Mongoose.Schema(
     {
-        name: {
-            type: String,
+        list: {
+            type: Object,
             required: true
         }
     }
