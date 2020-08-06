@@ -6,7 +6,7 @@ var http = require('http').createServer(app);
 const Mongoose = require('mongoose');
 const io = require('socket.io')(http);
 const mqtt = require('mqtt');
-const env = require("dotenv").config();
+require("dotenv").config();
 const OrderedActions = require("./Models/orderedActionModel");
 const Actions = require('./Models/actionModel');
 const Mode = require('./Models/modeModel');
