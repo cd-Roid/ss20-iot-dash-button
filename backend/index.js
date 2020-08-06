@@ -136,9 +136,10 @@ client.on('message', async function (topic, message) {
       io.emit('orderedProduct', newOrder);
     }
     else if (topic == "thkoeln/IoT/setup") {
-      let setup = JSON.parse(message);
+      let setup = computedMessage;
       let newID = new setupID({ SetupId: setup });
-      setupMessage = setupID;
+      setupMessage = computedMessage;
+      console.log("SetupMessage"+ setupMessage);
       await newID.save((err) => {
         if (err) {
           console.error(err);
@@ -157,22 +158,20 @@ app.get('/', (req, res) => {
 
 app.get("/setup", (req, res) => {
   try {
-    res.send(setupMessage);
+    res.status(200).json({message: setupMessage});
   } catch (error) {
     res.status(500).json({ message: error });
   }
 });
 
 app.post("/setup", (req, res) => {
-  try {
-    let randomID = setupMessage;
-    let eID = req.body.eID;
-    client.publish("thkoeln/IoT/setup/" + randomID, eID,
-      () => { console.log("Published id to new Device."); });
-    res.send({ message: "Device now registered under:" + eID });
-  } catch (error) {
-    res.status(500).json({ message: error });
-  }
+  let randomID = setupMessage;
+      console.log(randomID);
+      let eID = req.body.eID;
+       client.publish("thkoeln/IoT/setup/" + randomID, eID,
+        () => { console.log("Published id to new Device."); });
+      res.send({ message: "Device now registered under:" + eID });
+
 });
 
 app.get('/orders', async (req, res) => {
