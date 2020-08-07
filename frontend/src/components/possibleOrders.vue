@@ -1,20 +1,23 @@
 <template>
-  <div>
+  <b-container class="mt-3">
+    <h3>Products</h3>
     <ul>
-      <li v-for="order in orders" :key="order._id">
-        Name: {{order.name}}
-        Quantity: {{order.quantity}}
-        Steps: {{order.step}}
+      <li>
+        <product v-for="order in orders" :key="order._id" :order="order"></product>
       </li>
     </ul>
-  </div>
+  </b-container>
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex';
+import product from '@/components/Product.vue';
 
 export default {
-  name: 'OrderList',
+  name: 'possibleOrders',
+  components: {
+    product,
+  },
   computed: {
     ...mapState({
       orders: (state) => state.orderList,
@@ -29,6 +32,9 @@ export default {
 };
 </script>
 
-<style>
-
+<style scoped>
+ul {
+  list-style: none;
+  padding: 0;
+}
 </style>

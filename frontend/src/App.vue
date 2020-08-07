@@ -1,16 +1,41 @@
 <template>
   <div id="app">
     <Header />
-    <router-view/>
+    <router-view />
+    <SetupModal />
   </div>
 </template>
 
 <script>
 import Header from '@/components/Header.vue';
+import SetupModal from '@/components/setupModal.vue';
+import { mapState, mapActions } from 'vuex';
+import router from './router';
 
 export default {
+  name: 'App',
   components: {
     Header,
+    SetupModal,
+  },
+  computed: {
+    ...mapState({
+      mode: (state) => state.mode,
+    }),
+  },
+  methods: {
+    ...mapActions(['loadMode']),
+  },
+  watch: {
+    mode() {
+      if (this.mode) {
+        console.log('action modi');
+        router.push('/action');
+      } else router.push('/');
+    },
+  },
+  created() {
+    this.loadMode();
   },
 };
 </script>

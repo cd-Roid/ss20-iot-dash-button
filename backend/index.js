@@ -6,16 +6,19 @@ var http = require('http').createServer(app);
 const Mongoose = require('mongoose');
 const io = require('socket.io')(http);
 const mqtt = require('mqtt');
-const env = require("dotenv").config();
+require("dotenv").config();
+
 const OrderedActions = require("./Models/orderedActionModel");
 const Actions = require('./Models/actionModel');
 const Mode = require('./Models/modeModel');
 const productList = require('./Models/productListModel');
 const Orders = require('./Models/orderModel.js');
 const setupID = require("./Models/setupIDModel");
+const Employee = require("./Models/employeeModel");
+const modeModel = require('./Models/modeModel');
+
 
 let list = [];
-let setupMessage = 0;
 
 var client = mqtt.connect('mqtt://hivemq.dock.moxd.io');
 Mongoose.connect(
@@ -58,7 +61,12 @@ client.on('message', async function (topic, message) {
   // message is Buffer
   //console.log(message.length);
   if (message.length) {
-    let computedMessage = JSON.parse(message.toString());
+    let computedMessage = message.toString();
+    try {
+      computedMessage = JSON.parse(message.toString());
+    } catch (err) {
+      console.log(err)
+    }
     console.log('Message:' + message.toString());
     if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/list') {
       let newList = (list = new productList({ list: computedMessage }));
@@ -133,21 +141,27 @@ client.on('message', async function (topic, message) {
           console.log(`Saved ${newOrder} to db!`);
         }
       });
+      let mitarbeiter = await Employee.find({});
+      newOrder = newOrder.toJSON();
+      let name = mitarbeiter.find(elem => elem.eID == newOrder.eID);
+      newOrder.employee = name ? name.name : newOrder.eID
       io.emit('orderedProduct', newOrder);
     }
     else if (topic == "thkoeln/IoT/setup") {
-      let setup = computedMessage;
-      let newID = new setupID({ SetupId: setup });
-      setupMessage = computedMessage;
-      console.log("SetupMessage"+ setupMessage);
-      await newID.save((err) => {
-        if (err) {
-          console.error(err);
-        } else {
-          console.log(`Saved ${newID} to db!`);
-        }
-      });
-      io.emit('setupID', setup);
+      let device = await setupID.findOne({ SetupId: computedMessage })
+      if (device) {
+        io.emit('setupID', device);
+      } else {
+        let newID = new setupID({ SetupId: computedMessage });
+        await newID.save((err) => {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log(`Saved ${newID} to db!`);
+          }
+        });
+        io.emit('setupID', newID);
+      }
     }
   }
 });
@@ -156,26 +170,22 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-app.get("/setup", (req, res) => {
-  try {
-    res.status(200).json({message: setupMessage});
-  } catch (error) {
-    res.status(500).json({ message: error });
-  }
+app.get("/devices", async (req, res) => {
+  let newDevices = await setupID.find({});
+  console.log(newDevices);
+  res.send(newDevices);
 });
 
-app.post("/setup", (req, res) => {
-  let randomID = setupMessage;
-      console.log(randomID);
-      let eID = req.body.eID;
-       client.publish("thkoeln/IoT/setup/" + randomID, eID,
-        () => { console.log("Published id to new Device."); });
-      res.send({ message: "Device now registered under:" + eID });
-
+app.get("/users", async (req, res) => {
+  let users = await Employee.find({});
+  console.log(users);
+  res.send(users);
 });
 
 app.get('/orders', async (req, res) => {
-  let currentOrders = await Orders.find({});
+  let currentOrders = await Orders.find({}).sort("-time");
+  let mitarbeiter = await Employee.find({});
+  currentOrders = await Orders.addName(currentOrders, mitarbeiter);
   console.log(currentOrders);
   res.send(currentOrders);
 });
@@ -194,12 +204,19 @@ app.get('/orderedActions', async (req, res) => {
 
 app.get('/actions', async (req, res) => {
   let actions = await Actions.find({});
-  console.log(actions);
+  io.emit("actions", actions);
   res.send(actions);
+});
+
+app.get('/mode', async (req, res) => {
+  let mode = await modeModel.findOne({});
+  console.log(mode);
+  res.send("" + mode.mode);
 });
 
 io.on('connection', (socket) => {
   console.log('a user connected');
+
   socket.on('newProduct', (msg) => {
     list.push(msg);
     client.publish(
@@ -209,6 +226,7 @@ io.on('connection', (socket) => {
     );
     console.log('message: ' + msg);
   });
+
   socket.on('mode_change', (msg) => {
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/mode',
@@ -217,8 +235,22 @@ io.on('connection', (socket) => {
     );
     console.log('message: ' + msg);
   });
-  io.emit('productList', list);
+
+  socket.on('setupDevice', async (msg) => {
+    const newEmployee = new Employee({ name: msg.name, eID: msg.eID });
+    await newEmployee.save();
+    await setupID.deleteOne({ SetupId: msg.setupID });
+    client.publish(
+      'thkoeln/IoT/setup/' + msg.setupID,
+      msg.eID.toString(),
+      { retain: true },
+    );
+    console.log('message: ' + msg);
+  });
+
 });
+
+
 
 http.listen(3000, () => {
   console.log('Server running');

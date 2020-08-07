@@ -22,7 +22,7 @@ export default {
     PossibleOrder,
   },
   created() {
-    this.$socket.emit('mode_change', 0);
+    // this.$socket.emit('mode_change', 0);
   },
 };
 </script>
