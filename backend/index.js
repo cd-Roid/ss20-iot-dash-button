@@ -248,6 +248,47 @@ io.on('connection', (socket) => {
     console.log('message: ' + msg);
   });
 
+  socket.on("add_action", message => {
+    client.publish("thkoeln/IoT/bmw/montage/mittelkonsole/actionList",
+      message.toString(),
+    );
+    console.log("added new action: " + message);
+  })
+
+  socket.on("remove_action", message => {
+    client.publish("thkoeln/IoT/bmw/montage/mittelkonsole/actionList",
+      message.toString(),
+    );
+    console.log("removed action: " + message);
+  });
+
+  socket.on("dismiss_action", message => {
+    client.publish("thkoeln/IoT/bmw/montage/mittelkonsole/action/+", // change to actionoders
+      message.toString(),
+    );
+    console.log("acknowleged action: " + message);
+  });
+
+  socket.on("add_product", message => {
+    client.publish("thkoeln/IoT/bmw/montage/mittelkonsole/list",
+      message.toString(),
+    );
+    console.log("added new product: " + message);
+  })
+
+  socket.on("remove_product", message => {
+    client.publish("thkoeln/IoT/bmw/montage/mittelkonsole/list",
+      message.toString(),
+    );
+    console.log("removed Product: " + message);
+  });
+
+  socket.on("dismiss_order", message => {
+    client.publish("mittelkonsole/order/",
+      message.toString(),
+    );
+    console.log("acknowleged Order: " + message);
+  });
 });
 
 
