@@ -13,7 +13,7 @@ export default {
     OrderList,
   },
   created() {
-    this.$socket.emit('mode_change', 1);
+    // this.$socket.emit('mode_change', 1);
   },
 };
 </script>

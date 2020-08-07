@@ -27,4 +27,35 @@ export default {
   SOCKET_productList({ commit }, orderList) {
     commit('setOrderList', orderList);
   },
+  async loadNewDevices({ commit }) {
+    const result = await fetch('http://localhost:3000/devices');
+
+    if (!result.ok) {
+      throw new Error(`Could not access ${this.url}`);
+    }
+
+    const newDevices = await result.json();
+
+    commit('setNewDevices', newDevices);
+  },
+  SOCKET_setupID({ commit }, device) {
+    commit('addDevice', device);
+  },
+  removeDevice({ commit }, index) {
+    commit('deleteDevice', index);
+  },
+  async loadMode({ commit }) {
+    const result = await fetch('http://localhost:3000/mode');
+
+    if (!result.ok) {
+      throw new Error(`Could not access ${this.url}`);
+    }
+
+    const mode = await result.json();
+
+    commit('setMode', mode);
+  },
+  SOCKET_mode({ commit }, mode) {
+    commit('setMode', mode);
+  },
 };

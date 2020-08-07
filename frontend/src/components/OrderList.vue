@@ -1,8 +1,10 @@
 <template>
   <div>
-    <ul>
-      <order v-for="order in orders" :key="order._id" :order="order">
-      </order>
+    <ul class="order-list">
+      <li>
+        <order v-for="order in orders" :key="order._id" :order="order">
+        </order>
+      </li>
     </ul>
   </div>
 </template>
@@ -31,5 +33,9 @@ export default {
 </script>
 
 <style>
+.order-list {
+  padding: 0;
+  list-style: none;
+}
 
 </style>

@@ -3,7 +3,7 @@ const Mongoose = require('mongoose');
 const setupIDModel = new Mongoose.Schema(
     {
         SetupId: {
-            type: Number,
+            type: String,
             required: true
         }
     }
