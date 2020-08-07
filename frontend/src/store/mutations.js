@@ -17,4 +17,7 @@ export default {
   deleteDevice(state, index) {
     state.newDevices.splice(index, 1);
   },
+  setMode(state, mode) {
+    state.mode = mode;
+  },
 };

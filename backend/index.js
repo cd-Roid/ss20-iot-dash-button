@@ -14,7 +14,8 @@ const Mode = require('./Models/modeModel');
 const productList = require('./Models/productListModel');
 const Orders = require('./Models/orderModel.js');
 const setupID = require("./Models/setupIDModel");
-const Employee = require("./Models/employeeModel")
+const Employee = require("./Models/employeeModel");
+const modeModel = require('./Models/modeModel');
 
 let list = [];
 
@@ -204,6 +205,12 @@ app.get('/actions', async (req, res) => {
   let actions = await Actions.find({});
   console.log(actions);
   res.send(actions);
+});
+
+app.get('/mode', async (req, res) => {
+  let mode = await modeModel.findOne({});
+  console.log(mode);
+  res.send(""+mode.mode);
 });
 
 io.on('connection', (socket) => {

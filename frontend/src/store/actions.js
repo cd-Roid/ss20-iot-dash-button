@@ -44,4 +44,18 @@ export default {
   removeDevice({ commit }, index) {
     commit('deleteDevice', index);
   },
+  async loadMode({ commit }) {
+    const result = await fetch('http://localhost:3000/mode');
+
+    if (!result.ok) {
+      throw new Error(`Could not access ${this.url}`);
+    }
+
+    const mode = await result.json();
+
+    commit('setMode', mode);
+  },
+  SOCKET_mode({ commit }, mode) {
+    commit('setMode', mode);
+  },
 };
