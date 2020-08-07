@@ -139,6 +139,10 @@ client.on('message', async function (topic, message) {
           console.log(`Saved ${newOrder} to db!`);
         }
       });
+      let mitarbeiter = await Employee.find({});
+      newOrder = newOrder.toJSON();
+      let name = mitarbeiter.find(elem => elem.eID == newOrder.eID);
+      newOrder.employee = name ? name.name : newOrder.eID
       io.emit('orderedProduct', newOrder);
     }
     else if (topic == "thkoeln/IoT/setup") {
@@ -177,14 +181,8 @@ app.get("/users", async (req, res) => {
 });
 
 app.get('/orders', async (req, res) => {
-  let currentOrders = await Orders.find({}).sort("-time").map(res => {
-    // Sets a `loadedAt` property on the doc that tells you the time the
-    // document was loaded.
-    return res == null ?
-      res :
-      Object.assign(res, { loadedAt: new Date() });
-  });
-  let mitarbeiter = await Employee.find({})
+  let currentOrders = await Orders.find({}).sort("-time");
+  let mitarbeiter = await Employee.find({});
   currentOrders = await Orders.addName(currentOrders, mitarbeiter);
   console.log(currentOrders);
   res.send(currentOrders);
