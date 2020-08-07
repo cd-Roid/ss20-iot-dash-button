@@ -58,4 +58,47 @@ export default {
   SOCKET_mode({ commit }, mode) {
     commit('setMode', mode);
   },
+  async loadActions({ commit }) {
+    const result = await fetch('http://localhost:3000/actions');
+
+    if (!result.ok) {
+      throw new Error(`Could not access ${this.url}`);
+    }
+
+    const actions = await result.json();
+
+    commit('setActions', actions);
+  },
+  SOCKET_actions({ commit }, actions) {
+    commit('setActions', actions);
+  },
+  async deleteAction({ commit }, index) {
+    commit('deleteActions', index);
+  },
+  SOCKET_delete_action({ commit }, index) {
+    commit('deleteActions', index);
+  },
+  async loadOrderedAction({ commit }) {
+    const result = await fetch('http://localhost:3000/orderedActions');
+
+    if (!result.ok) {
+      throw new Error(`Could not access ${this.url}`);
+    }
+
+    const orderedActions = await result.json();
+
+    commit('setOrderedActions', orderedActions);
+  },
+  async dismissOrderedActions({ commit, index }) {
+    commit('dismissOrderedActions', index);
+  },
+  SOCKET_dismissAction({ commit }, actions) {
+    commit('dismiss_order', actions);
+  },
+  async addProduct({ commit, product }) {
+    commit('addProduct', product);
+  },
+  SOCKET_newProduct({ commit }, product) {
+    commit('newProduct', product);
+  },
 };

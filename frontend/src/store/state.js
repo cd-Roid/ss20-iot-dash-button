@@ -3,4 +3,6 @@ export default {
   orderList: [],
   newDevices: [],
   mode: 0,
+  actionList: [],
+  orderedActions: [],
 };
