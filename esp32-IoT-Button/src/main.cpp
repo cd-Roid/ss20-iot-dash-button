@@ -319,7 +319,7 @@ void callAction()
         String out = actionOut;
         out += String(mitarbeiterID);
         const char *c = out.c_str();
-        client.publish_P(c, buffer, n);
+        client.publish_P(c, buffer, false);
         bzero(buffer, n);
         lastHit = -1;
         displaySuccess();
@@ -357,7 +357,7 @@ void orderProduct()
         String out = outTopic;
         out += String(mitarbeiterID);
         const char *c = out.c_str();
-        client.publish_P(c, buffer, n);
+        client.publish_P(c, buffer, false);
         bzero(buffer, n);
         lastHit = -1;
         displaySuccess();
