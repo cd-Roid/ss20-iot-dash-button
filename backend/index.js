@@ -217,17 +217,6 @@ app.get('/mode', async (req, res) => {
 io.on('connection', (socket) => {
   console.log('a user connected');
 
-  socket.on('newProduct', (msg) => {
-    let stringed = JSON.stringify(msg);
-    console.log("stringed"+ stringed);
-    client.publish(
-      'thkoeln/IoT/bmw/montage/mittelkonsole/list',
-      stringed,
-      { retain: true },
-    );
-    console.log('message: ' + msg);
-  });
-
   socket.on('mode_change', (msg) => {
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/mode',
@@ -238,6 +227,17 @@ io.on('connection', (socket) => {
   });
 
   socket.on('newProduct', (msg) => {
+    productList.remove({ }, (err) => {
+      if (err) throw err;
+    });
+    const newList = JSON.stringify(msg);
+    client.publish(
+      'thkoeln/IoT/bmw/montage/mittelkonsole/list',
+         newList
+    );
+    console.log('Added New Product: ' + msg);
+  });
+  socket.on('newAction', (msg) => {
     productList.remove({ }, (err) => {
       if (err) throw err;
     });
