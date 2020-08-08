@@ -101,4 +101,10 @@ export default {
   SOCKET_newProduct({ commit }, product) {
     commit('newProduct', product);
   },
+  async addAction({ commit, product }) {
+    commit('addAction', product);
+  },
+  SOCKET_newAction({ commit }, action) {
+    commit('newAction', action);
+  },
 };
