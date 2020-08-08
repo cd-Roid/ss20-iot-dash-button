@@ -214,7 +214,7 @@ app.get('/mode', async (req, res) => {
   res.send("" + mode.mode);
 });
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
   console.log('a user connected');
 
   socket.on('mode_change', (msg) => {
@@ -254,10 +254,12 @@ io.on('connection', (socket) => {
     });
     console.log('Dismissed Order: ' + msg);
   });
-  socket.on('dismissAction', (msg) => {
-    Orders.deleteOne({ _id: msg }, (err) => {
+  socket.on('dismissAction', async (msg) => {
+    OrderedActions.deleteOne({ _id: msg }, (err) => {
       if (err) throw err;
     });
+    const newList = await OrderedActions.find({});
+    console.log(newList);
     console.log('Dismissed Action: ' + msg);
   });
 
