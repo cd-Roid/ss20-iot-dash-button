@@ -7,20 +7,86 @@
         </b-nav-item>
         <b-nav-item to="/action" @click="fireAcionMode()">Action Mode
         </b-nav-item>
+        <b-nav-item  @click="showModal">
+          Add Product
+          <b-modal ref="AddProductModal">
+                  <div>
+          <b-card
+           text-variant="dark"
+            header="Add Product">
+            <p> Product Name</p>
+            <form @submit.prevent="">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text"
+                    v-model="product.name"
+                    name="name"
+                    class="form-control"/>
+                     <label for="stueck">Stück</label>
+                      <input type="number"
+                    v-model="product.quantity"
+                    name="stueck"
+                    class="form-control"/>
+                     <label for="step">Steps</label>
+                      <input type="number"
+                    v-model="product.step"
+                    name="step"
+                    class="form-control"/>
+                </div>
+                 <div class="form-group">
+                <button class="btn btn-primary" @click="submit()">
+                  Add Product
+                </button>
+                 </div>
+            </form>
+            </b-card>
+      </div>
+          </b-modal>
+        </b-nav-item>
       </b-navbar-nav>
     </b-navbar>
   </div>
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
+
 export default {
   name: 'Header',
+  data() {
+    return {
+      product: {
+        name: '',
+        quantity: 0,
+        step: 0,
+      },
+    };
+  },
   methods: {
+    ...mapMutations(['addProduct']),
     fireOrderMode() {
       this.$socket.emit('mode_change', 0);
     },
     fireAcionMode() {
       this.$socket.emit('mode_change', 1);
+    },
+    showModal() {
+      this.$refs.AddProductModal.show();
+    },
+    hideModal() {
+      this.$refs.AddProductModal.hide();
+      // this.product.name = '';
+      //  this.product.quantity = 0;
+      //  this.product.steps = 0;
+    },
+    submit() {
+      const that = this;
+      console.log(this.product);
+      this.addProduct(that.product);
+
+      this.hideModal();
+      const fullList = this.$store.state.orderList;
+      this.$socket.emit('newProduct', fullList);
     },
   },
 };
