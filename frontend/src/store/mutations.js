@@ -23,8 +23,8 @@ export default {
   setActions(state, actions) {
     state.actionList = actions;
   },
-  addActions(state, action) {
-    state.actionList.push(action);
+  addAction(state, action) {
+    state.actionList[0].list.push(action);
   },
   deleteActions(state, index) {
     state.actionList.list.splice(index);
