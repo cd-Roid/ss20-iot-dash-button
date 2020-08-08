@@ -93,7 +93,7 @@ export default {
     commit('dismissOrderedActions', index);
   },
   SOCKET_dismissAction({ commit }, actions) {
-    commit('dismiss_order', actions);
+    commit('dismissAction', actions);
   },
   async addProduct({ commit, product }) {
     commit('addProduct', product);
@@ -106,5 +106,11 @@ export default {
   },
   SOCKET_newAction({ commit }, action) {
     commit('newAction', action);
+  },
+  async ackOrder({ commit, product }) {
+    commit('dismissOrder', product);
+  },
+  SOCKET_dismissOrder({ commit }, order) {
+    commit('dismissOrder', order);
   },
 };

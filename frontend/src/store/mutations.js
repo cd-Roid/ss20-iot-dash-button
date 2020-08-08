@@ -32,12 +32,17 @@ export default {
   setOrderedActions(state, orderedActions) {
     state.orderedActions = orderedActions;
   },
-  dismissOrderedActions(state, index) {
+  dismissOrderedActions(state, actionID) {
     state.orderedActions = state.orderedActions
-      // eslint-disable-next-line no-underscore-dangle
-      .filter((action) => action.orderedActions._id !== index);
+    // eslint-disable-next-line no-underscore-dangle
+      .filter((el) => el._id !== actionID);
   },
   addProduct(state, product) {
     state.orderList.push(product);
+  },
+  dismissOrder(state, orderID) {
+    state.orders = state.orders
+      // eslint-disable-next-line no-underscore-dangle
+      .filter((el) => el._id !== orderID);
   },
 };
