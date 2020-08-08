@@ -248,6 +248,18 @@ io.on('connection', (socket) => {
     );
     console.log('Added New Action: ' + msg);
   });
+  socket.on('dismissOrder', (msg) => {
+    Orders.deleteOne({ _id: msg }, (err) => {
+      if (err) throw err;
+    });
+    console.log('Dismissed Order: ' + msg);
+  });
+  socket.on('dismissAction', (msg) => {
+    Orders.deleteOne({ _id: msg }, (err) => {
+      if (err) throw err;
+    });
+    console.log('Dismissed Action: ' + msg);
+  });
 
   socket.on('setupDevice', async (msg) => {
     const newEmployee = new Employee({ name: msg.name, eID: msg.eID });
