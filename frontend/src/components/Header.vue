@@ -43,6 +43,32 @@
       </div>
           </b-modal>
         </b-nav-item>
+        <b-nav-item  @click="showModal">
+          Add Action
+          <b-modal ref="AddProductModal">
+                  <div>
+          <b-card
+           text-variant="dark"
+            header="Add Product">
+            <p> Product Name</p>
+            <form @submit.prevent="">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text"
+                    v-model="action.name"
+                    name="name"
+                    class="form-control"/>
+                </div>
+                 <div class="form-group">
+                <button class="btn btn-primary" @click="submitAction()">
+                  Add Action
+                </button>
+                 </div>
+            </form>
+            </b-card>
+      </div>
+          </b-modal>
+        </b-nav-item>
       </b-navbar-nav>
     </b-navbar>
   </div>
@@ -60,10 +86,13 @@ export default {
         quantity: 0,
         step: 0,
       },
+      action: {
+        name: '',
+      },
     };
   },
   methods: {
-    ...mapMutations(['addProduct']),
+    ...mapMutations(['addProduct', 'addAction']),
     fireOrderMode() {
       this.$socket.emit('mode_change', 0);
     },
@@ -75,18 +104,24 @@ export default {
     },
     hideModal() {
       this.$refs.AddProductModal.hide();
-      // this.product.name = '';
-      //  this.product.quantity = 0;
-      //  this.product.steps = 0;
     },
     submit() {
       const that = this;
       console.log(this.product);
       this.addProduct(that.product);
-
       this.hideModal();
       const fullList = this.$store.state.orderList;
       this.$socket.emit('newProduct', fullList);
+      this.product.name = '';
+      this.product.quantity = 0;
+      this.product.steps = 0;
+    },
+    submitAction() {
+      const that = this;
+      this.addAction(that.action);
+      this.hideModal();
+      const fullList = this.$store.state.actionList[0].list;
+      this.$socket.emit('newAction', fullList);
     },
   },
 };
