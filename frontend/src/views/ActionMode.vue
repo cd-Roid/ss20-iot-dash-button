@@ -1,8 +1,9 @@
 <template>
-  <b-jumbotron header="Actions" lead="Possible Actions">
-    <possibleActions></possibleActions>
-   <h2>Ordered Actions</h2>
+  <b-jumbotron header="Actions" lead="Ordered Actions">
     <actionList></actionList>
+    <possibleActions>
+
+    </possibleActions>
       </b-jumbotron>
 </template>
 
