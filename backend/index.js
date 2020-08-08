@@ -218,10 +218,11 @@ io.on('connection', (socket) => {
   console.log('a user connected');
 
   socket.on('newProduct', (msg) => {
-    list.push(msg);
+    let stringed = JSON.stringify(msg);
+    console.log("stringed"+ stringed);
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/list',
-      JSON.stringify(list),
+      stringed,
       { retain: true },
     );
     console.log('message: ' + msg);
@@ -231,9 +232,21 @@ io.on('connection', (socket) => {
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/mode',
       msg.toString(),
-      { retain: true },
+      { retain: false },
     );
     console.log('message: ' + msg);
+  });
+
+  socket.on('newProduct', (msg) => {
+    productList.remove({ }, (err) => {
+      if (err) throw err;
+    });
+    const newList = JSON.stringify(msg);
+    client.publish(
+      'thkoeln/IoT/bmw/montage/mittelkonsole/list',
+         newList
+    );
+    console.log('Added New Product: ' + msg);
   });
 
   socket.on('setupDevice', async (msg) => {
