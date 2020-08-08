@@ -34,7 +34,7 @@
                     class="form-control"/>
                 </div>
                  <div class="form-group">
-                <button class="btn btn-primary" @click="submit()">
+                <button class="btn btn-primary" @click="submitProduct()">
                   Add Product
                 </button>
                  </div>
@@ -43,14 +43,14 @@
       </div>
           </b-modal>
         </b-nav-item>
-        <b-nav-item  @click="showModal">
+        <b-nav-item  @click="showActionModal">
           Add Action
-          <b-modal ref="AddProductModal">
+          <b-modal ref="AddActionModal">
                   <div>
           <b-card
            text-variant="dark"
-            header="Add Product">
-            <p> Product Name</p>
+            header="Add Action">
+            <p> Action</p>
             <form @submit.prevent="">
                 <div class="form-group">
                     <label for="name">Name</label>
@@ -102,10 +102,16 @@ export default {
     showModal() {
       this.$refs.AddProductModal.show();
     },
+    showActionModal() {
+      this.$refs.AddActionModal.show();
+    },
     hideModal() {
       this.$refs.AddProductModal.hide();
     },
-    submit() {
+    hideActionModal() {
+      this.$refs.AddActionModal.hide();
+    },
+    submitProduct() {
       const that = this;
       console.log(this.product);
       this.addProduct(that.product);
@@ -119,7 +125,7 @@ export default {
     submitAction() {
       const that = this;
       this.addAction(that.action);
-      this.hideModal();
+      this.hideActionModal();
       const fullList = this.$store.state.actionList[0].list;
       this.$socket.emit('newAction', fullList);
     },
