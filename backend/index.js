@@ -238,15 +238,15 @@ io.on('connection', (socket) => {
     console.log('Added New Product: ' + msg);
   });
   socket.on('newAction', (msg) => {
-    productList.remove({ }, (err) => {
+    Actions.remove({ }, (err) => {
       if (err) throw err;
     });
     const newList = JSON.stringify(msg);
     client.publish(
-      'thkoeln/IoT/bmw/montage/mittelkonsole/list',
+      'thkoeln/IoT/bmw/montage/mittelkonsole/actionList',
          newList
     );
-    console.log('Added New Product: ' + msg);
+    console.log('Added New Action: ' + msg);
   });
 
   socket.on('setupDevice', async (msg) => {
