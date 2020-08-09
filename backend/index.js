@@ -68,6 +68,7 @@ client.on('message', async function (topic, message) {
     }
     // console.log('Message:' + message.toString());
     if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/list') {
+      console.log("on RECIVE:" + JSON.stringify(computedMessage));
       productList.remove({}, (err) => {
         if (err) throw err;
       });
@@ -250,11 +251,12 @@ io.on('connection', async (socket) => {
     }) 
     const n = await productList.find({});
     const newList = JSON.stringify(n);
+    console.log("alle Produkte:" + newList );
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/list',
          newList, {retain: true}
     );
-    console.log('Added New Product: ' + msg.name);
+    console.log('Added New Product: ' + n);
   });
   socket.on('newAction', async (msg) => {
     let newAction = new Actions({ name: msg.name }, (error) => {
@@ -288,16 +290,19 @@ io.on('connection', async (socket) => {
     console.log('Deleted New Action: ' + msg);
   });
   socket.on('deleteProduct',async  (msg) => {
-    productList.remove({ _id: msg }, (err) => {
+    productList.deleteOne({ _id: msg }, (err) => {
       if (err) throw err;
     });
-    const n = await productList.find({ }, (err) => { if (err) throw err; });
-    const newList = JSON.stringify(n);
-    client.publish(
-      'thkoeln/IoT/bmw/montage/mittelkonsole/actionList',
-         newList, {retain: true}
-    );
-    console.log('Deleted New Action: ' + newList);
+     productList.find({ },'name quantity step')
+    .then(data => {
+      const newList = JSON.stringify(data);
+      client.publish(
+        'thkoeln/IoT/bmw/montage/mittelkonsole/list',
+        newList, { retain: true }
+      );
+    });
+    
+   console.log('Deleted New Product: ' + msg);
   });
   socket.on('dismissOrder', (msg) => {
     Orders.deleteOne({ _id: msg }, (err) => {
