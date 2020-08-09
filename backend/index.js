@@ -87,6 +87,9 @@ client.on('message', async function (topic, message) {
     })
       io.emit('productList', computedMessage);
     } else if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/actionList') {
+      Actions.remove({}, (err) => {
+        if (err) throw err;
+      });
       computedMessage.forEach(el=>{
         let newAction = new Actions({name: el.name});
         newAction.save(function (err) {
