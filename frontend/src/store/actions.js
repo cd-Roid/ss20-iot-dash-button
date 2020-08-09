@@ -92,31 +92,16 @@ export default {
   async dismissOrderedActions({ commit, index }) {
     commit('dismissOrderedActions', index);
   },
-  SOCKET_dismissAction({ commit }, actions) {
-    commit('dismissAction', actions);
-  },
   async addProduct({ commit, product }) {
     commit('addProduct', product);
-  },
-  SOCKET_newProduct({ commit }, product) {
-    commit('newProduct', product);
   },
   async addAction({ commit, product }) {
     commit('addAction', product);
   },
-  SOCKET_newAction({ commit }, action) {
-    commit('newAction', action);
-  },
   async ackOrder({ commit, product }) {
     commit('dismissOrder', product);
   },
-  SOCKET_dismissOrder({ commit }, order) {
-    commit('dismissOrder', order);
-  },
   async deleteProduct({ commit, product }) {
     commit('dismissOrder', product);
-  },
-  SOCKET_deleteProduct({ commit }, order) {
-    commit('dismissOrder', order);
   },
 };
