@@ -85,14 +85,16 @@ client.on('message', async function (topic, message) {
       Actions.remove({}, (err) => {
         if (err) throw err;
       });
-      const newActions = new Actions({ list: computedMessage });
-      await newActions.save((err) => {
-        if (err) {
-          console.error(err);
-        } else {
-          console.log(`Saved ${newActions} to db!`);
-        }
-      });
+      computedMessage.forEach(el=>{
+        let newAction = new Actions({name: el.name});
+        newAction.save(function (err) {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log(`Saved ${newAction} to db!`);
+          }
+      }) 
+    })
       io.emit('actionList', computedMessage);
     } else if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/mode') {
       let newMode = new Mode({ mode: computedMessage });
