@@ -112,22 +112,18 @@ export default {
       this.$refs.AddActionModal.hide();
     },
     submitProduct() {
-      const that = this;
-      console.log(this.product);
-      this.addProduct(that.product);
       this.hideModal();
-      const fullList = this.$store.state.orderList;
-      this.$socket.emit('newProduct', fullList);
-      this.product.name = '';
-      this.product.quantity = 0;
-      this.product.steps = 0;
+      const newProduct = this.product;
+      console.log(newProduct);
+      this.$store.commit('addProduct', this.product);
+      this.$socket.emit('newProduct', newProduct);
+      console.log('Added new Product');
     },
     submitAction() {
-      const that = this;
-      this.addAction(that.action);
+      const newAction = this.action;
+      this.addAction(newAction);
       this.hideActionModal();
-      const fullList = this.$store.state.actionList[0].list;
-      this.$socket.emit('newAction', fullList);
+      this.$socket.emit('newAction', newAction);
     },
   },
 };
