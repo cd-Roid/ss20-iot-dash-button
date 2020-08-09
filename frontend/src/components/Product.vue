@@ -12,7 +12,7 @@
           href="#"
           variant="danger"
           :data-vue-id="order._id"
-          @click="deleteAction(order._id)"
+          @click="deleteProduct(order._id)"
           >Delete
       </b-button>
       </template>
@@ -20,21 +20,15 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex';
+import { mapActions } from 'vuex';
 
 export default {
   name: 'Order',
   props: {
     order: Object,
   },
-  ...mapMutations(['deleteProduct']),
   methods: {
-    deleteAction() {
-    // eslint-disable-next-line no-underscore-dangle
-      const toDelete = this.order._id;
-      this.$store.commit('deleteProduct', toDelete);
-      this.$socket.emit('deleteProduct', toDelete);
-    },
+    ...mapActions(['deleteProduct']),
   },
 };
 </script>
