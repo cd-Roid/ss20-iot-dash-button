@@ -2,10 +2,18 @@ const Mongoose = require('mongoose');
 
 const ProductListModel = new Mongoose.Schema(
     {
-        list: {
-            type: Object,
-            required: true
-        }
+        name: {
+			type: String,
+			required: true
+		},
+		quantity: {
+			type: Number,
+			required: true
+		},
+		step: {
+			type: Number,
+			required: true
+		},
     }
 )
 
