@@ -5,8 +5,8 @@
         <b-button
           href="#"
           variant="danger"
-          :data-vue-id="action.name"
-          @click="deleteAction(action.name)"
+          :data-vue-id="action._id"
+          @click="deleteAction(action._id)"
           >Delete
       </b-button>
       </template>
