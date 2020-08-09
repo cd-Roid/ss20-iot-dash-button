@@ -73,10 +73,9 @@ export default {
     commit('setActions', actions);
   },
   async deleteAction({ commit }, index) {
-    commit('deleteActions', index);
-  },
-  SOCKET_delete_action({ commit }, index) {
-    commit('deleteActions', index);
+    commit('deleteAction', index);
+    // eslint-disable-next-line no-underscore-dangle
+    this._vm.$socket.emit('deleteAction', index);
   },
   async loadOrderedAction({ commit }) {
     const result = await fetch('http://localhost:3000/orderedActions');
@@ -89,19 +88,19 @@ export default {
 
     commit('setOrderedActions', orderedActions);
   },
-  async dismissOrderedActions({ commit, index }) {
+  async dismissOrderedActions({ commit }, index) {
     commit('dismissOrderedActions', index);
   },
-  async addProduct({ commit, product }) {
+  async addProduct({ commit }, product) {
     commit('addProduct', product);
   },
-  async addAction({ commit, product }) {
+  async addAction({ commit }, product) {
     commit('addAction', product);
   },
-  async ackOrder({ commit, product }) {
+  async ackOrder({ commit }, product) {
     commit('dismissOrder', product);
   },
-  async deleteProduct({ commit, product }) {
+  async deleteProduct({ commit }, product) {
     commit('dismissOrder', product);
   },
 };
