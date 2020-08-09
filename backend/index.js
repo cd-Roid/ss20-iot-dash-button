@@ -239,16 +239,26 @@ io.on('connection', async (socket) => {
     );
     console.log('Added New Product: ' + msg);
   });
-  socket.on('newAction', (msg) => {
-    Actions.remove({ }, (err) => {
+  socket.on('newAction', async (msg) => {
+    Actions.remove({ _id: msg }, (err) => {
       if (err) throw err;
     });
-    const newList = JSON.stringify(msg);
+    const n = await Actions.find({});
+    const newList = JSON.stringify(n);
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/actionList',
          newList
     );
     console.log('Added New Action: ' + msg);
+  });
+  socket.on('deleteAction',async  (msg) => {
+    Actions.remove({ _id: msg }, (err) => {
+      if (err) throw err;
+    });
+    const n = await Actions.find({});
+    const newList = JSON.stringify(n);
+    client.publish( 'thkoeln/IoT/bmw/montage/mittelkonsole/actionList',newList, {retain: true })
+    console.log('Deleted New Action: ' + msg);
   });
   socket.on('dismissOrder', (msg) => {
     Orders.deleteOne({ _id: msg }, (err) => {
