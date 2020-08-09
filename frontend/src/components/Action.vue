@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapMutations } from 'vuex';
 
 export default {
   name: 'Action',
@@ -22,7 +22,13 @@ export default {
     action: Object,
   },
   methods: {
-    ...mapActions(['deleteAction']),
+    ...mapMutations(['deleteAction']),
+    deleteAction() {
+      // eslint-disable-next-line no-underscore-dangle
+      const toDelete = this.action._id;
+      this.$store.commit('deleteAction', toDelete);
+      this.$socket.emit('deleteAction', toDelete);
+    },
   },
 };
 </script>
