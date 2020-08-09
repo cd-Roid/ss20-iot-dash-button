@@ -224,7 +224,7 @@ io.on('connection', async (socket) => {
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/mode',
       msg.toString(),
-      { retain: false },
+      { retain: true },
     );
     console.log('message: ' + msg);
   });
@@ -249,7 +249,7 @@ io.on('connection', async (socket) => {
     const newList = JSON.stringify(n);
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/list',
-         newList
+         newList, {retain: true}
     );
     console.log('Added New Product: ' + msg.name);
   });
