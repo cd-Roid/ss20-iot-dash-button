@@ -22,7 +22,7 @@ export default {
 
     const orderList = await result.json();
 
-    commit('setOrderList', orderList.list);
+    commit('setOrderList', orderList);
   },
   SOCKET_productList({ commit }, orderList) {
     commit('setOrderList', orderList);
@@ -111,6 +111,12 @@ export default {
     commit('dismissOrder', product);
   },
   SOCKET_dismissOrder({ commit }, order) {
+    commit('dismissOrder', order);
+  },
+  async deleteProduct({ commit, product }) {
+    commit('dismissOrder', product);
+  },
+  SOCKET_deleteProduct({ commit }, order) {
     commit('dismissOrder', order);
   },
 };
