@@ -3,7 +3,7 @@
     <h3>Possible Actions</h3>
     <ul>
       <li>
-        <action v-for="action in actions" :key="action.name" :action="action"></action>
+        <action v-for="action in actions" :key="action._id" :action="action"></action>
       </li>
     </ul>
   </b-container>
@@ -20,7 +20,7 @@ export default {
   },
   computed: {
     ...mapState({
-      actions: (state) => state.actionList[0].list,
+      actions: (state) => state.actionList,
     }),
   },
   methods: {
