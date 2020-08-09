@@ -291,7 +291,13 @@ io.on('connection', async (socket) => {
     productList.remove({ _id: msg }, (err) => {
       if (err) throw err;
     });
-    console.log('Deleted New Action: ' + msg);
+    const n = await productList.find({ }, (err) => { if (err) throw err; });
+    const newList = JSON.stringify(n);
+    client.publish(
+      'thkoeln/IoT/bmw/montage/mittelkonsole/actionList',
+         newList, {retain: true}
+    );
+    console.log('Deleted New Action: ' + newList);
   });
   socket.on('dismissOrder', (msg) => {
     Orders.deleteOne({ _id: msg }, (err) => {
