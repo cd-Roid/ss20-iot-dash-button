@@ -97,7 +97,9 @@ export default {
   async addAction({ commit }, product) {
     commit('addAction', product);
   },
-  async ackOrder({ commit }, product) {
+  async dismissOrder({ commit }, product) {
+    // eslint-disable-next-line no-underscore-dangle
+    this._vm.$socket.emit('dismissOrder', product);
     commit('dismissOrder', product);
   },
   async deleteProduct({ commit }, product) {

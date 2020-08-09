@@ -10,7 +10,7 @@
           href="#"
           variant="primary"
           :data-vue-id="order._id"
-          @click="dismiss(order._id)"
+          @click="dismissOrder(order._id)"
           >Dismiss
       </b-button>
     </b-card-body>
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex';
+import { mapActions } from 'vuex';
 
 export default {
   name: 'Order',
@@ -55,14 +55,8 @@ export default {
       self.now = Date.now();
     }, 60000);
   },
-  ...mapMutations(['dissmissOrder']),
   methods: {
-    dismiss() {
-      // eslint-disable-next-line no-underscore-dangle
-      const toDelete = this.order._id;
-      this.$store.commit('dismissOrder', toDelete);
-      this.$socket.emit('dismissOrder', toDelete);
-    },
+    ...mapActions(['dismissOrder']),
   },
 };
 </script>
