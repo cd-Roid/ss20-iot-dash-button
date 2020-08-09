@@ -27,7 +27,7 @@ export default {
     ...mapActions(['loadOrderList']),
   },
   created() {
-    this.loadOrderList();
+    this.$store.dispatch('loadOrderList');
   },
 };
 </script>

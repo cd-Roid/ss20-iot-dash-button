@@ -240,8 +240,8 @@ io.on('connection', async (socket) => {
     console.log('Added New Product: ' + msg);
   });
   socket.on('newAction', async (msg) => {
-    Actions.remove({ _id: msg }, (err) => {
-      if (err) throw err;
+    Actions.remove({ _id: msg }, (error) => {
+      if (error) throw erorr;
     });
     const n = await Actions.find({});
     const newList = JSON.stringify(n);
