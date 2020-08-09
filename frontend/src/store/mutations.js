@@ -24,10 +24,11 @@ export default {
     state.actionList = actions;
   },
   addAction(state, action) {
-    state.actionList[0].list.push(action);
+    state.actionList.push(action);
   },
-  deleteActions(state, index) {
-    state.actionList.list.splice(index);
+  deleteAction(state, actionID) {
+    // eslint-disable-next-line no-underscore-dangle
+    state.actionList = state.actionList.filter((el) => el._id !== actionID);
   },
   setOrderedActions(state, orderedActions) {
     state.orderedActions = orderedActions;
