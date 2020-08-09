@@ -6,7 +6,7 @@
           href="#"
           variant="primary"
           :data-vue-id="action._id"
-          @click="dismiss(action._id)"
+          @click="dismissOrderedActions(action._id)"
           >Dismiss
       </b-button>
     </b-card-body>
@@ -48,12 +48,6 @@ export default {
   },
   methods: {
     ...mapActions(['dismissOrderedActions']),
-    dismiss() {
-      // eslint-disable-next-line no-underscore-dangle
-      const toDelete = this.action._id;
-      this.$store.commit('dismissOrderedActions', toDelete);
-      this.$socket.emit('dismissAction', toDelete);
-    },
   },
   created() {
     const self = this;
