@@ -17,7 +17,6 @@ const setupID = require("./Models/setupIDModel");
 const Employee = require("./Models/employeeModel");
 const modeModel = require('./Models/modeModel');
 
-
 let list = [];
 
 var client = mqtt.connect('mqtt://hivemq.dock.moxd.io');
@@ -67,19 +66,25 @@ client.on('message', async function (topic, message) {
     } catch (err) {
       console.log(err)
     }
-    console.log('Message:' + message.toString());
+    // console.log('Message:' + message.toString());
     if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/list') {
-      let newList = (list = new productList({ list: computedMessage }));
       productList.remove({}, (err) => {
         if (err) throw err;
       });
-      await newList.save(function (err) {
-        if (err) {
-          console.error(err);
-        } else {
-          console.log(`Saved ${newList} to db!`);
-        }
-      });
+      computedMessage.forEach(el=>{
+        let newProduct = new productList({
+          name: el.name,
+          quantity: el.quantity,
+          step: el.step
+        });
+        newProduct.save(function (err) {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log(`Saved ${newProduct} to db!`);
+          }
+      }) 
+    })
       io.emit('productList', computedMessage);
     } else if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/actionList') {
       Actions.remove({}, (err) => {
@@ -193,8 +198,9 @@ app.get('/orders', async (req, res) => {
 });
 
 app.get('/orderList', async (req, res) => {
-  let currentOrders = await productList.findOne({});
+  let currentOrders = await productList.find({});
   console.log(currentOrders);
+  io.emit('orderList',currentOrders);
   res.send(currentOrders);
 });
 
@@ -228,20 +234,39 @@ io.on('connection', async (socket) => {
     console.log('message: ' + msg);
   });
 
-  socket.on('newProduct', (msg) => {
-    productList.remove({ }, (err) => {
+  socket.on('newProduct', async (msg) => {
+    console.log("Incoming Product:"+ msg);
+    let newProduct =new productList({ 
+      name: msg.name,
+      quantity: msg.quantity,
+      step: msg.step,
+      }, (err) => {
       if (err) throw err;
     });
-    const newList = JSON.stringify(msg);
+    newProduct.save(function (err) {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log(`Saved ${newProduct} to db!`);
+      }
+    }) 
+    const newList = await productList.find({});
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/list',
-         newList
+         newList,{retain: true }
     );
-    console.log('Added New Product: ' + msg);
+    console.log('Added New Product: ' + msg.name);
   });
   socket.on('newAction', async (msg) => {
-    Actions.remove({ _id: msg }, (error) => {
-      if (error) throw erorr;
+    let newAction = new Actions({ name: msg.name }, (error) => {
+      if (error) throw error;
+    });
+    newAction.save((err) => {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log(`Saved ${msg.name} to db!`);
+      }
     });
     const n = await Actions.find({});
     const newList = JSON.stringify(n);
