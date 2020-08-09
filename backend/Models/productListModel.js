@@ -7,11 +7,11 @@ const ProductListModel = new Mongoose.Schema(
 			required: true
 		},
 		quantity: {
-			type: Number,
+			type: String,
 			required: true
 		},
 		step: {
-			type: Number,
+			type: String,
 			required: true
 		},
     }
