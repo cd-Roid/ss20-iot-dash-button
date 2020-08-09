@@ -197,7 +197,6 @@ app.get('/orders', async (req, res) => {
 app.get('/orderList', async (req, res) => {
   let currentOrders = await productList.find({});
   console.log(currentOrders);
-  io.emit('orderList',currentOrders);
   res.send(currentOrders);
 });
 
@@ -209,7 +208,6 @@ app.get('/orderedActions', async (req, res) => {
 
 app.get('/actions', async (req, res) => {
   let actions = await Actions.find({});
-  io.emit("actions", actions);
   res.send(actions);
 });
 
