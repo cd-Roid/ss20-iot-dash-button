@@ -267,14 +267,14 @@ io.on('connection', async (socket) => {
         console.log(`Saved ${msg.name} to db!`);
       }
     });
-    Actions.remove({});
-    const n = await Actions.find({});
+ 
+    const n = await Actions.find({ }, (err) => { if (err) throw err; });
     const newList = JSON.stringify(n);
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/actionList',
          newList
     );
-    console.log('Added New Action: ' + msg);
+    console.log('Added New Action: ' + newList);
   });
   socket.on('deleteAction',async  (msg) => {
     Actions.remove({ _id: msg }, (err) => {
