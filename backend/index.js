@@ -268,7 +268,6 @@ io.on('connection', async (socket) => {
       }
     });
     const n = await Actions.find({ }, (err) => { if (err) throw err; });
-    //await Actions.remove({ }, (err) => { if (err) throw err; });
     const newList = JSON.stringify(n);
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/actionList',
@@ -280,6 +279,12 @@ io.on('connection', async (socket) => {
     Actions.remove({ _id: msg }, (err) => {
       if (err) throw err;
     });
+    const n = await Actions.find({ }, (err) => { if (err) throw err; });
+    const newList = JSON.stringify(n);
+    client.publish(
+      'thkoeln/IoT/bmw/montage/mittelkonsole/actionList',
+         newList, {retain: true}
+    );
     console.log('Deleted New Action: ' + msg);
   });
   socket.on('deleteProduct',async  (msg) => {
