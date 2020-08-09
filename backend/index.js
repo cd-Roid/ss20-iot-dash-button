@@ -83,13 +83,10 @@ client.on('message', async function (topic, message) {
           } else {
             console.log(`Saved ${newProduct} to db!`);
           }
-      }) 
+      });
     })
       io.emit('productList', computedMessage);
     } else if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/actionList') {
-      Actions.remove({}, (err) => {
-        if (err) throw err;
-      });
       computedMessage.forEach(el=>{
         let newAction = new Actions({name: el.name});
         newAction.save(function (err) {
@@ -250,10 +247,11 @@ io.on('connection', async (socket) => {
         console.log(`Saved ${newProduct} to db!`);
       }
     }) 
-    const newList = await productList.find({});
+    const n = await productList.find({});
+    const newList = JSON.stringify(n);
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/list',
-         newList,{retain: true }
+         newList
     );
     console.log('Added New Product: ' + msg.name);
   });
@@ -268,6 +266,7 @@ io.on('connection', async (socket) => {
         console.log(`Saved ${msg.name} to db!`);
       }
     });
+    Actions.remove({});
     const n = await Actions.find({});
     const newList = JSON.stringify(n);
     client.publish(
@@ -280,9 +279,12 @@ io.on('connection', async (socket) => {
     Actions.remove({ _id: msg }, (err) => {
       if (err) throw err;
     });
-    const n = await Actions.find({});
-    const newList = JSON.stringify(n);
-    client.publish( 'thkoeln/IoT/bmw/montage/mittelkonsole/actionList',newList, {retain: true })
+    console.log('Deleted New Action: ' + msg);
+  });
+  socket.on('deleteProduct',async  (msg) => {
+    productList.remove({ _id: msg }, (err) => {
+      if (err) throw err;
+    });
     console.log('Deleted New Action: ' + msg);
   });
   socket.on('dismissOrder', (msg) => {
