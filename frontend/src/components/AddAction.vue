@@ -33,7 +33,4 @@ export default {
 </script>
 
 <style scoped>
-.card {
-  margin: 10px;
-}
 </style>

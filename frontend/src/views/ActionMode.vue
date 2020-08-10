@@ -1,12 +1,11 @@
 <template>
-     <b-container fluid class="h100">
+  <b-container fluid class="h100">
     <b-row align-v="stretch">
       <b-col cols="9">
-        <actionList/>
+        <actionList />
       </b-col>
       <b-col class="sidebar">
-        <NewAction>
-          </NewAction>
+        <NewAction></NewAction>
         <possibleActions />
       </b-col>
     </b-row>
@@ -31,5 +30,12 @@ export default {
 };
 </script>
 
-<style>
+<style scoped lang="scss">
+.sidebar {
+  background: #eee;
+}
+
+.main {
+  min-height: 100%;
+}
 </style>
