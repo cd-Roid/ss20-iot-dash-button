@@ -24,32 +24,20 @@ export default {
   setActions(state, actions) {
     state.actionList = actions;
   },
-  addAction(state, action) {
-    state.actionList.push(action);
-  },
-  deleteAction(state, actionID) {
-    // eslint-disable-next-line no-underscore-dangle
-    state.actionList = state.actionList.filter((el) => el._id !== actionID);
-  },
   setOrderedActions(state, orderedActions) {
     state.orderedActions = orderedActions;
+  },
+  addOrderedAction(state, newOrder) {
+    state.orderedActions.unshift(newOrder);
   },
   dismissOrderedActions(state, actionID) {
     state.orderedActions = state.orderedActions
     // eslint-disable-next-line no-underscore-dangle
       .filter((el) => el._id !== actionID);
   },
-  addProduct(state, product) {
-    state.orderList.push(product);
-  },
   dismissOrder(state, orderID) {
     state.orders = state.orders
       // eslint-disable-next-line no-underscore-dangle
       .filter((el) => el._id !== orderID);
-  },
-  deleteProduct(state, product) {
-    state.orderList = state.orderList
-      // eslint-disable-next-line no-underscore-dangle
-      .filter((el) => el._id !== product);
   },
 };

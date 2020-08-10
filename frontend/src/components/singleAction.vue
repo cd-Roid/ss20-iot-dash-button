@@ -2,18 +2,19 @@
   <b-card no-body class="actionOrder">
     <b-card-body>
       <b-card-title>{{ action.name }}</b-card-title>
-        <b-button
-          href="#"
-          variant="primary"
-          :data-vue-id="action._id"
-          @click="dismissOrderedActions(action._id)"
-          >Dismiss
-      </b-button>
+      <b-button
+        href="#"
+        variant="primary"
+        :data-vue-id="action._id"
+        @click="dismissOrderedActions(action._id)"
+      >Dismiss</b-button>
     </b-card-body>
     <template v-slot:footer>
-      <p>von: {{action.eID }}</p>
+      <p>
+        von: {{action.employee }}
         <em>Vor {{timepassed}}</em>
-      </template>
+      </p>
+    </template>
   </b-card>
 </template>
 
@@ -59,7 +60,7 @@ export default {
 </script>
 
 <style lang="scss">
-  .actionOrder {
-    margin: 10px 0;
-  }
+.actionOrder {
+  margin: 10px 0;
+}
 </style>
