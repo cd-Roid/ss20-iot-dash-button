@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <b-container class="mt-3">
     <b-card>
       <h2>Add Product</h2>
       <form @submit.prevent="sendProduct(product)">
@@ -16,7 +16,7 @@
         </div>
       </form>
     </b-card>
-  </div>
+  </b-container>
 </template>
 
 <script>

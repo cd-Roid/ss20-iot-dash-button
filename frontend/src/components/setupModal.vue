@@ -1,38 +1,19 @@
 <template>
   <b-modal hide-footer v-model="showModal" title="Setup Devices">
     <div>
-      <b-row
-        :current-page="currentPage"
-        :per-page="1">
+      <b-row :current-page="currentPage" :per-page="1">
         <b-col v-for="(device, index) in paginatedItems" :key="device._id">
-          <b-card
-            text-variant="dark"
-            :header="`Device ${index+1}`"
-            >
-            <p class="card-text">
-              {{device.SetupId}}
-            </p>
+          <b-card text-variant="dark" :header="`Device ${index+1}`">
+            <p class="card-text">{{device.SetupId}}</p>
             <form @submit.prevent="setupDevice(device, index)">
               <div class="form-group">
                 <label for="name">Name</label>
-                <input
-                  type="text"
-                  v-model="name"
-                  name="name"
-                  class="form-control"
-                />
+                <input type="text" v-model="name" name="name" class="form-control" />
                 <label for="eID">Mitarbeiter Nummer (0-255)</label>
-                <input
-                  type="text"
-                  v-model="eID"
-                  name="eID"
-                  class="form-control"
-                />
+                <input type="text" v-model="eID" name="eID" class="form-control" />
               </div>
               <div class="form-group">
-                <button class="btn btn-primary">
-                  Setup
-                </button>
+                <button class="btn btn-primary">Setup</button>
               </div>
             </form>
           </b-card>
@@ -107,7 +88,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .card {
   margin-bottom: 10px;
 }

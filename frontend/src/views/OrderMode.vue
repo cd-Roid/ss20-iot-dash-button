@@ -5,8 +5,7 @@
         <OrderList />
       </b-col>
       <b-col class="sidebar">
-        <NewProduct>
-          </NewProduct>
+        <NewProduct />
         <PossibleOrder />
       </b-col>
     </b-row>
@@ -32,11 +31,11 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .sidebar {
-    background: #eee;
-  }
+.sidebar {
+  background: #eee;
+}
 
-  .main {
-    min-height: 100%;
-  }
+.main {
+  min-height: 100%;
+}
 </style>
