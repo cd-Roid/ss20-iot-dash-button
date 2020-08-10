@@ -75,36 +75,18 @@ client.on('message', async function (topic, message) {
       productList.remove({}, (err) => {
         if (err) throw err;
       });
-      computedMessage.forEach((el) => {
-        let newProduct = new productList({
-          name: el.name,
-          quantity: el.quantity,
-          step: el.step,
-        });
-        newProduct.save(function (err) {
-          if (err) {
-            console.error(err);
-          } else {
-            console.log(`Saved ${newProduct} to db!`);
-          }
-        });
+      productList.create(computedMessage).then(async (data) => {
+        console.log("Sending new List to Client...")
+        io.emit('productList', data);
       });
-      io.emit('productList', computedMessage);
     } else if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/actionList') {
       Actions.remove({}, (err) => {
         if (err) throw err;
       });
-      computedMessage.forEach((el) => {
-        let newAction = new Actions({ name: el.name });
-        newAction.save(function (err) {
-          if (err) {
-            console.error(err);
-          } else {
-            console.log(`Saved ${newAction} to db!`);
-          }
-        });
+      Actions.create(computedMessage).then(async (data) => {
+        console.log("Sending new List to Client...")
+        io.emit('actionList', data);
       });
-      io.emit('actionList', computedMessage);
     } else if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/mode') {
       let newMode = new Mode({ mode: computedMessage });
       Mode.remove({}, (err) => {
