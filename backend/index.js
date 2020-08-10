@@ -284,7 +284,7 @@ io.on('connection', async (socket) => {
   });
 
   socket.on('setupDevice', async (msg) => {
-    const newEmployee = new Employee({ name: msg.name, eID: msg.eID, setupID });
+    const newEmployee = new Employee({ name: msg.name, eID: msg.eID, setupID: msg.setupID });
     await newEmployee.save();
     await setupID.deleteOne({ SetupId: msg.setupID });
     client.publish('thkoeln/IoT/setup/' + msg.setupID, msg.eID.toString(), {

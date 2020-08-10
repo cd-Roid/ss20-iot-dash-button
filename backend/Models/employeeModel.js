@@ -9,6 +9,10 @@ const EmployeeModel = new Mongoose.Schema(
         eID: {
             type: Number,
             required: true
+        },
+        setupID: {
+            type: String,
+            required: true
         }
     }
 )
