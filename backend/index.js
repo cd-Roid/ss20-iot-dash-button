@@ -218,53 +218,24 @@ io.on('connection', async (socket) => {
   });
 
   socket.on('newProduct', async (msg) => {
-    console.log('Incoming Product:' + msg);
-    let newProduct = new productList(
-      {
-        name: msg.name,
-        quantity: msg.quantity,
-        step: msg.step,
-      },
-      (err) => {
-        if (err) throw err;
-      },
-    );
-    newProduct.save(function (err) {
-      if (err) {
-        console.error(err);
-      } else {
-        console.log(`Saved ${newProduct} to db!`);
-      }
+    let products = await productList.find({}, '-_id -__v');
+    products.push({
+      name: msg.name,
+      quantity: msg.quantity,
+      step: msg.step,
     });
-    const n = await productList.find({}, '-_id -__v');
-    const newList = JSON.stringify(n);
-    console.log('alle Produkte:' + newList);
-    client.publish('thkoeln/IoT/bmw/montage/mittelkonsole/list', newList, {
+    client.publish('thkoeln/IoT/bmw/montage/mittelkonsole/list', JSON.stringify(products), {
       retain: true,
     });
-    console.log('Added New Product: ' + n);
   });
   socket.on('newAction', async (msg) => {
-    let newAction = new Actions({ name: msg.name }, (error) => {
-      if (error) throw error;
+    let actions = await Actions.find({}, '-_id -__v');
+    actions.push({
+      name: msg.name,
     });
-    newAction.save((err) => {
-      if (err) {
-        console.error(err);
-      } else {
-        console.log(`Saved ${msg.name} to db!`);
-      }
+    client.publish('thkoeln/IoT/bmw/montage/mittelkonsole/actionList', JSON.stringify(actions), {
+      retain: true,
     });
-    const n = await Actions.find({}, '-_id -__v', (err) => {
-      if (err) throw err;
-    });
-    const newList = JSON.stringify(n);
-    client.publish(
-      'thkoeln/IoT/bmw/montage/mittelkonsole/actionList',
-      newList,
-      { retain: true },
-    );
-    console.log('Added New Action: ' + newList);
   });
   socket.on('deleteAction', async (msg) => {
     Actions.remove({ _id: msg }, (err) => {
