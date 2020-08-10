@@ -288,7 +288,7 @@ io.on('connection', async (socket) => {
     await newEmployee.save();
     await setupID.deleteOne({ SetupId: msg.setupID });
     client.publish('thkoeln/IoT/setup/' + msg.setupID, msg.eID.toString(), {
-      retain: true,
+      retain: false,
     });
     console.log('message: ' + msg);
   });
