@@ -93,11 +93,6 @@ export default {
     this._vm.$socket.emit('dismissAction', index);
     commit('dismissOrderedActions', index);
   },
-  async addProduct({ commit }, product) {
-    // eslint-disable-next-line no-underscore-dangle
-    this._vm.$socket.emit('newProduct', product);
-    commit('addProduct', product);
-  },
   async addAction({ commit }, product) {
     // eslint-disable-next-line no-underscore-dangle
     this._vm.$socket.emit('newAction', product);

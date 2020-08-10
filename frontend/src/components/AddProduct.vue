@@ -35,7 +35,7 @@ export default {
   methods: {
     ...mapActions(['addProduct']),
     sendProduct(product) {
-      this.addProduct(product);
+      this.$socket.emit('newProduct', product);
       this.product.name = '';
       this.product.quantity = 1;
       this.product.step = 1;

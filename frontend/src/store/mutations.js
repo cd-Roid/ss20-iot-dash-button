@@ -39,9 +39,6 @@ export default {
     // eslint-disable-next-line no-underscore-dangle
       .filter((el) => el._id !== actionID);
   },
-  addProduct(state, product) {
-    state.orderList.push(product);
-  },
   dismissOrder(state, orderID) {
     state.orders = state.orders
       // eslint-disable-next-line no-underscore-dangle
