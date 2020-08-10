@@ -1,20 +1,17 @@
 <template>
-  <b-card no-body class="order">
+  <b-card no-body class="actionOrder">
     <b-card-body>
-      <b-card-title>{{ order.name }}</b-card-title>
-      <b-card-text>
-        <p>Anzahl: {{ order.quantity }}</p>
-        <p>Mitarbeiter: {{ order.employee }}</p>
-      </b-card-text>
+      <b-card-title>{{ action.name }}</b-card-title>
         <b-button
           href="#"
           variant="primary"
-          :data-vue-id="order._id"
-          @click="dismissOrder(order._id)"
+          :data-vue-id="action._id"
+          @click="dismissOrderedActions(action._id)"
           >Dismiss
       </b-button>
     </b-card-body>
     <template v-slot:footer>
+      <p>von: {{action.eID }}</p>
         <em>Vor {{timepassed}}</em>
       </template>
   </b-card>
@@ -24,9 +21,9 @@
 import { mapActions } from 'vuex';
 
 export default {
-  name: 'Order',
+  name: 'Action',
   props: {
-    order: Object,
+    action: Object,
   },
   data() {
     return {
@@ -36,7 +33,7 @@ export default {
   computed: {
     timepassed() {
       const currentTime = this.now;
-      const savedTime = new Date(this.order.time);
+      const savedTime = new Date(this.action.time);
       const timePassed = (currentTime - savedTime) / 1000;
       let minutes = Math.floor((timePassed / 60) % 60);
       let hours = Math.floor((timePassed / 60) / 60);
@@ -49,20 +46,20 @@ export default {
       return `${hours}  ${minutes} minutes`;
     },
   },
+  methods: {
+    ...mapActions(['dismissOrderedActions']),
+  },
   created() {
     const self = this;
     setInterval(() => {
       self.now = Date.now();
     }, 60000);
   },
-  methods: {
-    ...mapActions(['dismissOrder']),
-  },
 };
 </script>
 
 <style lang="scss">
-  .order {
+  .actionOrder {
     margin: 10px 0;
   }
 </style>

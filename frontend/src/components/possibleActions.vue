@@ -1,9 +1,9 @@
 <template>
   <b-container class="mt-3">
-    <h3>Products</h3>
+    <h3>Possible Actions</h3>
     <ul>
       <li>
-        <product v-for="order in orders" :key="order._id" :order="order"></product>
+        <action v-for="action in actions" :key="action._id" :action="action"></action>
       </li>
     </ul>
   </b-container>
@@ -11,23 +11,23 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
-import product from '@/components/Product.vue';
+import action from '@/components/Action.vue';
 
 export default {
-  name: 'possibleOrders',
+  name: 'possibleActions',
   components: {
-    product,
+    action,
   },
   computed: {
     ...mapState({
-      orders: (state) => state.orderList,
+      actions: (state) => state.actionList,
     }),
   },
   methods: {
-    ...mapActions(['loadOrderList']),
+    ...mapActions(['loadActions']),
   },
   created() {
-    this.loadOrderList();
+    this.loadActions();
   },
 };
 </script>
