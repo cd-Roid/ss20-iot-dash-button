@@ -44,9 +44,4 @@ export default {
       // eslint-disable-next-line no-underscore-dangle
       .filter((el) => el._id !== orderID);
   },
-  deleteProduct(state, product) {
-    state.orderList = state.orderList
-      // eslint-disable-next-line no-underscore-dangle
-      .filter((el) => el._id !== product);
-  },
 };

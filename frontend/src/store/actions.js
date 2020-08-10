@@ -103,9 +103,4 @@ export default {
     this._vm.$socket.emit('dismissOrder', product);
     commit('dismissOrder', product);
   },
-  async deleteProduct({ commit }, product) {
-    // eslint-disable-next-line no-underscore-dangle
-    this._vm.$socket.emit('deleteProduct', product);
-    commit('deleteProduct', product);
-  },
 };

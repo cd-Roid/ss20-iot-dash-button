@@ -8,19 +8,17 @@
       </b-card-text>
     </b-card-body>
     <template v-slot:footer>
-        <b-button
-          href="#"
-          variant="danger"
-          :data-vue-id="order._id"
-          @click="deleteProduct(order._id)"
-          >Delete
-      </b-button>
-      </template>
+      <b-button
+        href="#"
+        variant="danger"
+        :data-vue-id="order._id"
+        @click="deleteProduct(order._id)"
+      >Delete</b-button>
+    </template>
   </b-card>
 </template>
 
 <script>
-import { mapActions } from 'vuex';
 
 export default {
   name: 'Order',
@@ -28,13 +26,15 @@ export default {
     order: Object,
   },
   methods: {
-    ...mapActions(['deleteProduct']),
+    deleteProduct(id) {
+      this.$socket.emit('deleteProduct', id);
+    },
   },
 };
 </script>
 
 <style lang="scss">
-  .order {
-    margin: 10px 0;
-  }
+.order {
+  margin: 10px 0;
+}
 </style>
