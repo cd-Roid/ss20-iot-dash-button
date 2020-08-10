@@ -24,13 +24,6 @@ export default {
   setActions(state, actions) {
     state.actionList = actions;
   },
-  addAction(state, action) {
-    state.actionList.push(action);
-  },
-  deleteAction(state, actionID) {
-    // eslint-disable-next-line no-underscore-dangle
-    state.actionList = state.actionList.filter((el) => el._id !== actionID);
-  },
   setOrderedActions(state, orderedActions) {
     state.orderedActions = orderedActions;
   },

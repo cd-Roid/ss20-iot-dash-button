@@ -72,11 +72,6 @@ export default {
   SOCKET_actions({ commit }, actions) {
     commit('setActions', actions);
   },
-  async deleteAction({ commit }, index) {
-    commit('deleteAction', index);
-    // eslint-disable-next-line no-underscore-dangle
-    this._vm.$socket.emit('deleteAction', index);
-  },
   async loadOrderedAction({ commit }) {
     const result = await fetch('http://localhost:3000/orderedActions');
 
@@ -95,11 +90,6 @@ export default {
     // eslint-disable-next-line no-underscore-dangle
     this._vm.$socket.emit('dismissAction', index);
     commit('dismissOrderedActions', index);
-  },
-  async addAction({ commit }, product) {
-    // eslint-disable-next-line no-underscore-dangle
-    this._vm.$socket.emit('newAction', product);
-    commit('addAction', product);
   },
   async dismissOrder({ commit }, product) {
     // eslint-disable-next-line no-underscore-dangle

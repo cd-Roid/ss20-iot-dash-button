@@ -16,7 +16,6 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
 
 export default {
   data() {
@@ -27,7 +26,9 @@ export default {
     };
   },
   methods: {
-    ...mapActions(['addAction']),
+    addAction(action) {
+      this.$socket.emit('newAction', action);
+    },
   },
 };
 </script>

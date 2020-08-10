@@ -15,15 +15,15 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
-
 export default {
   name: 'Action',
   props: {
     action: Object,
   },
   methods: {
-    ...mapActions(['deleteAction']),
+    deleteAction(id) {
+      this.$socket.emit('deleteAction', id);
+    },
   },
 };
 </script>
