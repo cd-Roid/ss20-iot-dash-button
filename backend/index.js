@@ -249,7 +249,7 @@ io.on('connection', async (socket) => {
         console.log(`Saved ${newProduct} to db!`);
       }
     }) 
-    const n = await productList.find({});
+    const n = await productList.find({}, "-_id -__v");
     const newList = JSON.stringify(n);
     console.log("alle Produkte:" + newList );
     client.publish(
@@ -269,7 +269,7 @@ io.on('connection', async (socket) => {
         console.log(`Saved ${msg.name} to db!`);
       }
     });
-    const n = await Actions.find({ }, (err) => { if (err) throw err; });
+    const n = await Actions.find({ },  "-_id -__v", (err) => { if (err) throw err; });
     const newList = JSON.stringify(n);
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/actionList',
@@ -281,7 +281,7 @@ io.on('connection', async (socket) => {
     Actions.remove({ _id: msg }, (err) => {
       if (err) throw err;
     });
-    const n = await Actions.find({ }, (err) => { if (err) throw err; });
+    const n = await Actions.find({ },  "-_id -__v", (err) => { if (err) throw err; });
     const newList = JSON.stringify(n);
     client.publish(
       'thkoeln/IoT/bmw/montage/mittelkonsole/actionList',
@@ -293,7 +293,7 @@ io.on('connection', async (socket) => {
     productList.deleteOne({ _id: msg }, (err) => {
       if (err) throw err;
     });
-     productList.find({ },'name quantity step')
+     productList.find({ }, "-_id -__v")
     .then(data => {
       const newList = JSON.stringify(data);
       client.publish(
