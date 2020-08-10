@@ -85,7 +85,7 @@ client.on('message', async function (topic, message) {
       });
       Actions.create(computedMessage).then(async (data) => {
         console.log("Sending new List to Client...")
-        io.emit('actionList', data);
+        io.emit('actions', data);
       });
     } else if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/mode') {
       let newMode = new Mode({ mode: computedMessage });
@@ -247,15 +247,12 @@ io.on('connection', async (socket) => {
     Actions.remove({ _id: msg }, (err) => {
       if (err) throw err;
     });
-    const n = await Actions.find({}, '-_id -__v', (err) => {
-      if (err) throw err;
+    Actions.find({}, '-_id -__v').then((data) => {
+      const newList = JSON.stringify(data);
+      client.publish('thkoeln/IoT/bmw/montage/mittelkonsole/actionList', newList, {
+        retain: true,
+      });
     });
-    const newList = JSON.stringify(n);
-    client.publish(
-      'thkoeln/IoT/bmw/montage/mittelkonsole/actionList',
-      newList,
-      { retain: true },
-    );
     console.log('Deleted New Action: ' + msg);
   });
   socket.on('deleteProduct', async (msg) => {
