@@ -253,6 +253,39 @@ void callback(char *topic, byte *payload, unsigned int length)
   delay(500);
 }
 
+void reset()
+{
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Reset");
+  lcd.setCursor(0, 1);
+  lcd.print("DeviceID?");
+  int i = 0;
+  while (1)
+  {
+    switchState = digitalRead(switchPin);
+    if (switchState != prevSwitchState)
+    {
+      if (switchState == HIGH)
+      {
+        mitarbeiterID = 255;
+        EEPROM.write(0, 255);
+        EEPROM.commit();
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Resetting...");
+        delay(300);
+      }
+    }
+    i++;
+    if (i == 5000)
+    {
+      break;
+    }
+    delay(1);
+  }
+}
+
 void setup()
 {
   Serial.begin(9600);
@@ -261,18 +294,25 @@ void setup()
   encoder.setCount(0);
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 1);
   esp_sleep_enable_ext1_wakeup(WAKEUP_PIN_BITMASK, ESP_EXT1_WAKEUP_ALL_LOW);
-  timer = 0;
+
   EEPROM.begin(EEPROM_SIZE);
   mitarbeiterID = EEPROM.read(0);
   mode = EEPROM.read(1);
+
   lcd.begin(16, 2);
-  lcd.setCursor(0, 0);
-  lcd.print("Welcome :)");
+
+  pinMode(switchPin, INPUT);
+
+  esp_sleep_wakeup_cause_t wakeup_reason;
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+  if (!wakeup_reason && mitarbeiterID != 255)
+    reset();
+
+  timer = 0;
+
   setupWifi();
   client.setServer(broker, 1883);
   client.setCallback(callback);
-
-  pinMode(switchPin, INPUT);
 
   lcd.createChar(0, customChar);
   lcd.createChar(1, topLeftCheck);
@@ -387,7 +427,7 @@ void loop()
     {
       lcd.clear();
       lcd.setCursor(0, 0);
-      lcd.println("Init Setup");
+      lcd.print("Initial Setup");
       lcd.setCursor(0, 1);
       lcd.print("Setup @ Web");
       lastHit = hits;
@@ -488,7 +528,7 @@ void loop()
       }
     }
     timer++;
-    if (timer == 30000)
+    if (timer == 5000)
     {
       lcd.setRGB(0, 0, 0);
       lcd.noDisplay();
