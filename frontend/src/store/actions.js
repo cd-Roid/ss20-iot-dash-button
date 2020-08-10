@@ -88,6 +88,9 @@ export default {
 
     commit('setOrderedActions', orderedActions);
   },
+  SOCKET_orderedAction({ commit }, orderedAction) {
+    commit('addOrderedAction', orderedAction);
+  },
   async dismissOrderedActions({ commit }, index) {
     // eslint-disable-next-line no-underscore-dangle
     this._vm.$socket.emit('dismissAction', index);

@@ -34,6 +34,9 @@ export default {
   setOrderedActions(state, orderedActions) {
     state.orderedActions = orderedActions;
   },
+  addOrderedAction(state, newOrder) {
+    state.orderedActions.unshift(newOrder);
+  },
   dismissOrderedActions(state, actionID) {
     state.orderedActions = state.orderedActions
     // eslint-disable-next-line no-underscore-dangle

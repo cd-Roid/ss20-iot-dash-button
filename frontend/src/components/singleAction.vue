@@ -11,7 +11,7 @@
     </b-card-body>
     <template v-slot:footer>
       <p>
-        von: {{action.eID }}
+        von: {{action.employee }}
         <em>Vor {{timepassed}}</em>
       </p>
     </template>

@@ -110,14 +110,18 @@ client.on('message', async function (topic, message) {
         time: new Date(),
         eID: eID,
       });
-      orderedAction.save((err) => {
+      await orderedAction.save((err) => {
         if (err) {
           console.error(err);
         } else {
           console.log(`Saved ${orderedAction} to db!`);
         }
       });
-      io.emit('orderedAction', orderedAction.toJSON());
+      let mitarbeiter = await Employee.find({});
+      orderedAction = orderedAction.toJSON();
+      let name = mitarbeiter.find((elem) => elem.eID == orderedAction.eID);
+      orderedAction.employee = name ? name.name : orderedAction.eID;
+      io.emit('orderedAction', orderedAction);
     } else if (topic.startsWith('mittelkonsole/order/')) {
       let id = topic.split('/');
       id = id[id.length - 1];
@@ -190,6 +194,8 @@ app.get('/orderList', async (req, res) => {
 
 app.get('/orderedActions', async (req, res) => {
   let orderedActions = await OrderedActions.find({}).sort('-time');
+  let mitarbeiter = await Employee.find({});
+  orderedActions = await Orders.addName(orderedActions, mitarbeiter);
   console.log(orderedActions);
   res.send(orderedActions);
 });
