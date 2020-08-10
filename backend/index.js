@@ -117,7 +117,7 @@ client.on('message', async function (topic, message) {
           console.log(`Saved ${orderedAction} to db!`);
         }
       });
-      io.emit('orderedAction', computedMessage);
+      io.emit('orderedAction', orderedAction.toJSON());
     } else if (topic.startsWith('mittelkonsole/order/')) {
       let id = topic.split('/');
       id = id[id.length - 1];
@@ -189,7 +189,7 @@ app.get('/orderList', async (req, res) => {
 });
 
 app.get('/orderedActions', async (req, res) => {
-  let orderedActions = await OrderedActions.find({});
+  let orderedActions = await OrderedActions.find({}).sort('-time');
   console.log(orderedActions);
   res.send(orderedActions);
 });
