@@ -1,0 +1,26 @@
+{
+  "name": "ss20-iot-dash-button",
+  "version": "1.0.0",
+  "description": "Git Hub Pages to IoT SS20 Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cd-Roid/ss20-iot-dash-button.git"
+  },
+  "author": "Nils Polarek",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cd-Roid/ss20-iot-dash-button/issues"
+  },
+  "homepage": "https://github.com/cd-Roid/ss20-iot-dash-button#readme",
+  "dependencies": {
+    "findit": "^2.0.0",
+    "mkdirp": "^1.0.4",
+    "node-sass": "^4.14.1",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2"
+  }
+}
