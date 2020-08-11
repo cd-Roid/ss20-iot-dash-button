@@ -46,6 +46,12 @@
 
 .section {
   max-width: 1200px;
-  margin: $l auto;
+  margin: $xxl auto;
   padding: 0 $m;
+}
+
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: $m;
 }

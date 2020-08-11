@@ -165,7 +165,12 @@ a {
 
 .section {
   max-width: 1200px;
-  margin: 29px auto;
+  margin: 76px auto;
   padding: 0 18px; }
+
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 18px; }
 
 /*# sourceMappingURL=main.css.map */
