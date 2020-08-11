@@ -88,3 +88,37 @@
     margin-bottom: $s;
   }
 }
+
+.software-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: $m;
+  margin-bottom: $xl;
+}
+
+.card {
+  box-shadow: $shadow;
+  //border: 1px solid $lighter;
+  border-radius: 4px;
+  transition: $tr-shadow;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: $shadow-hover;
+  }
+
+  &__header {
+    background: $lighter;
+    text-align: center;
+    padding: $l 0;
+  }
+
+  &__headline {
+    margin-bottom: 0;
+    color: $dark;
+  }
+
+  &__content {
+    padding: $m;
+  }
+}

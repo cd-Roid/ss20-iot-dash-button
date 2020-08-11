@@ -126,14 +126,26 @@ h2 {
 h3 {
   font-size: 18px; }
 
+h4 {
+  font-size: 18px; }
+
 section {
   margin-bottom: 29px; }
 
-a {
+a.link-clear {
   text-decoration: none;
-  color: #6fa7d8; }
+  color: #666; }
+  a.link-clear:hover {
+    color: #666; }
+
+a {
+  color: #156ebc;
+  text-decoration: none; }
   a:hover {
     color: #6fa7d8; }
+
+.no-margin {
+  margin-bottom: 0; }
 
 .head {
   display: flex;
@@ -198,5 +210,28 @@ a {
   padding-left: 18px; }
   .feature-list__item:not(:last-of-type) {
     margin-bottom: 11px; }
+
+.software-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 18px;
+  margin-bottom: 47px; }
+
+.card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  border-radius: 4px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: hidden; }
+  .card:hover {
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22); }
+  .card__header {
+    background: #eee;
+    text-align: center;
+    padding: 29px 0; }
+  .card__headline {
+    margin-bottom: 0;
+    color: #666; }
+  .card__content {
+    padding: 18px; }
 
 /*# sourceMappingURL=main.css.map */

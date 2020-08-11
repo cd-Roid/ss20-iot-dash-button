@@ -51,15 +51,32 @@ h3 {
   font-size: $m;
 }
 
+h4 {
+  font-size: $m;
+}
+
 section {
   margin-bottom: $l;
 }
 
-a {
+a.link-clear {
   text-decoration: none;
-  color: $blue;
+  color: $dark;
+
+  &:hover {
+    color: $dark;
+  }
+}
+
+a {
+  color: $dark-blue;
+  text-decoration: none;
 
   &:hover {
     color: $headline-color;
   }
+}
+
+.no-margin {
+  margin-bottom: 0;
 }
