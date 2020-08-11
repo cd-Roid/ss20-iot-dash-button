@@ -54,4 +54,24 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: $m;
+
+  &__hero {
+    box-shadow: $shadow;
+    transition: $tr-shadow;
+    margin-bottom: $l;
+    display: flex;
+
+    &:hover {
+      box-shadow: $shadow-hover;
+    }
+  }
+}
+
+.feature-list {
+  list-style: disc;
+  padding-left: $m;
+
+  &__item:not(:last-of-type) {
+    margin-bottom: $s;
+  }
 }
