@@ -1,0 +1,66 @@
+* {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  font-family: $font-family-sans;
+  font-size: $m;
+  line-height: $lh-default;
+  font-weight: $fw-normal;
+  hyphens: auto;
+  color: $text-color;
+}
+
+main {
+  //max-width: 50rem;
+  //margin-left: $m;
+}
+
+img {
+  width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin-bottom: $l;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: $lh-tight;
+  font-weight: $fw-bold;
+  color: $headline-color;
+}
+
+h1 {
+  font-size: $xl;
+}
+
+h2 {
+  font-size: $l;
+}
+
+h3 {
+  font-size: $m;
+}
+
+section {
+  margin-bottom: $l;
+}
+
+a {
+  text-decoration: none;
+  color: $blue;
+
+  &:hover {
+    color: $headline-color;
+  }
+}

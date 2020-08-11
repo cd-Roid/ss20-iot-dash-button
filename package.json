@@ -4,7 +4,10 @@
   "description": "Git Hub Pages to IoT SS20 Project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:css": "node-sass --source-map true styles/scss/main.scss -o styles/",
+    "watch:sass": "node-sass --source-map true --watch styles/scss/main.scss -o styles/",
+    "watch": "npm-run-all --parallel dev:css watch:*"
   },
   "repository": {
     "type": "git",

@@ -1,0 +1,51 @@
+.head {
+  display: flex;
+  justify-content: space-between;
+  padding: $m;
+  background: $darken;
+  color: $lightest;
+  position: fixed;
+  width: 100%;
+
+  &__logo {
+    margin-bottom: 0;
+    color: $lightest;
+  }
+
+  &__nav-list {
+    display: flex;
+    list-style: none;
+  }
+
+  &__nav-item:not(:last-of-type) {
+    margin-right: $m;
+  }
+
+  &__nav-link {
+    color: $lightest;
+  }
+}
+
+.hero {
+  max-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &__caption {
+    position: absolute;
+
+    text-align: center;
+  }
+
+  &__headline {
+    color: $lightest;
+  }
+}
+
+.section {
+  max-width: 1200px;
+  margin: $l auto;
+  padding: 0 $m;
+}
