@@ -6,6 +6,7 @@
   color: $lightest;
   position: fixed;
   width: 100%;
+  backdrop-filter: blur(2px);
 
   &__logo {
     margin-bottom: 0;
@@ -35,7 +36,6 @@
 
   &__caption {
     position: absolute;
-
     text-align: center;
   }
 
@@ -46,8 +46,21 @@
 
 .section {
   max-width: 1200px;
-  margin: $xxl auto;
-  padding: 0 $m;
+  margin: 0 auto;
+  padding: $xxl $m 0;
+
+  &__hero {
+    max-height: 40vh;
+    display: flex;
+    margin-bottom: $m;
+
+    &__image {
+      max-height: 100%;
+      object-fit: contain;
+      object-position: left;
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.8));
+    }
+  }
 }
 
 .comparison {

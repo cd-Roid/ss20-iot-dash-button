@@ -95,6 +95,9 @@ body {
   hyphens: auto;
   color: #666; }
 
+main {
+  padding-bottom: 76px; }
+
 img {
   width: 100%;
   height: auto; }
@@ -139,7 +142,8 @@ a {
   background: rgba(0, 0, 0, 0.3);
   color: #fff;
   position: fixed;
-  width: 100%; }
+  width: 100%;
+  backdrop-filter: blur(2px); }
   .head__logo {
     margin-bottom: 0;
     color: #fff; }
@@ -165,8 +169,17 @@ a {
 
 .section {
   max-width: 1200px;
-  margin: 76px auto;
-  padding: 0 18px; }
+  margin: 0 auto;
+  padding: 76px 18px 0; }
+  .section__hero {
+    max-height: 40vh;
+    display: flex;
+    margin-bottom: 18px; }
+    .section__hero__image {
+      max-height: 100%;
+      object-fit: contain;
+      object-position: left;
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.8)); }
 
 .comparison {
   display: grid;
