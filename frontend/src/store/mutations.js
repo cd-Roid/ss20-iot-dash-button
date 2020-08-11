@@ -40,4 +40,7 @@ export default {
       // eslint-disable-next-line no-underscore-dangle
       .filter((el) => el._id !== orderID);
   },
+  showSetup(state) {
+    state.showSetupModal += 1;
+  },
 };

@@ -5,4 +5,5 @@ export default {
   mode: 0,
   actionList: [],
   orderedActions: [],
+  showSetupModal: 0,
 };

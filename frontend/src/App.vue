@@ -3,6 +3,7 @@
     <Header />
     <router-view />
     <SetupModal />
+    <fab />
   </div>
 </template>
 
@@ -10,6 +11,7 @@
 import Header from '@/components/Header.vue';
 import SetupModal from '@/components/setupModal.vue';
 import { mapState, mapActions } from 'vuex';
+import fab from '@/components/FAB.vue';
 import router from './router';
 
 export default {
@@ -17,6 +19,7 @@ export default {
   components: {
     Header,
     SetupModal,
+    fab,
   },
   computed: {
     ...mapState({
