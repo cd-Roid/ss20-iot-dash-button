@@ -13,7 +13,9 @@ export default {
     state.newDevices = devices;
   },
   addDevice(state, device) {
-    state.newDevices.push(device);
+    const foundDevice = state.newDevices.find((el) => el.SetupId === device.SetupId);
+    if (foundDevice) state.showSetupModal += 1;
+    else { state.newDevices.push(device); }
   },
   deleteDevice(state, index) {
     state.newDevices.splice(index, 1);
