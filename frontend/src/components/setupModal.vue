@@ -49,6 +49,7 @@ export default {
   computed: {
     ...mapState({
       devices: (state) => state.newDevices,
+      showSetupModal: (state) => state.showSetupModal,
     }),
     paginatedItems() {
       return this.devices.slice(
@@ -60,6 +61,9 @@ export default {
   watch: {
     devices() {
       this.showModal = this.devices.length > 0;
+    },
+    showSetupModal() {
+      this.showModal = !this.showModal;
     },
   },
   methods: {

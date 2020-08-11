@@ -96,4 +96,7 @@ export default {
     this._vm.$socket.emit('dismissOrder', product);
     commit('dismissOrder', product);
   },
+  showSetup({ commit }) {
+    commit('showSetup');
+  },
 };
