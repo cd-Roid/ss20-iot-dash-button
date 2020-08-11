@@ -248,7 +248,8 @@ a {
   background: #333;
   color: #fff;
   border-radius: 4px;
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; }
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  margin-bottom: 18px; }
   .terminal__header {
     background: #eee;
     color: #666;
