@@ -3,8 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>IoT 2020 - Dash Button</title>
     <link rel="stylesheet" href="./styles/main.css" />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="https://th-koeln.github.io/mi-bachelor-webdevelopment/mi-lib/assets/images/favicon.ico"
+    />
   </head>
   <body>
     <header class="head">
@@ -16,6 +21,9 @@
           </li>
           <li class="head__nav-item">
             <a class="head__nav-link" href="#features">Features</a>
+          </li>
+          <li class="head__nav-item">
+            <a class="head__nav-link" href="#demo">Demo</a>
           </li>
           <li class="head__nav-item">
             <a class="head__nav-link" href="#hardware">Hardware</a>
@@ -155,6 +163,20 @@
           </div>
         </article>
       </section>
+
+      <section class="section" id="demo">
+        <h2>Demo</h2>
+        <iframe
+          id="ytplayer"
+          type="text/html"
+          width="1200"
+          height="675"
+          src="https://www.youtube-nocookie.com/embed/T4lWkwNdf3w?&rel=0&modestbranding=1"
+          frameborder="0"
+          allowfullscreen
+        ></iframe>
+      </section>
+
       <section class="section" id="hardware">
         <h2>Hardware</h2>
         <figure class="section__hero">
@@ -332,6 +354,230 @@
             >
           </li>
         </ul>
+      </section>
+
+      <section class="section" id="documentation">
+        <h2>Documentation</h2>
+        <h3>Allgemeines Setup</h3>
+        <ol class="doc-list">
+          <li>
+            <p>
+              Klone das GitHub Repository:
+              <a
+                href="https://github.com/cd-Roid/ss20-iot-dash-button"
+                target="_blank"
+                >https://github.com/cd-Roid/ss20-iot-dash-button</a
+              >
+              und wechsle in den Ordner
+            </p>
+            <div class="terminal">
+              <div class="terminal__header">CMD</div>
+              <div class="terminal__input">
+                <p class="terminal__line">
+                  git clone https://github.com/cd-Roid/ss20-iot-dash-button.git
+                </p>
+                <p class="terminal__line">cd ss20-iot-dash-button</p>
+              </div>
+            </div>
+          </li>
+        </ol>
+        <h3>Setup des Microcontrollers</h3>
+        <ol class="doc-list">
+          <li>
+            <p>
+              Installiere
+              <a href="https://platformio.org/" target="_blank">PlatformIO</a>
+              für
+              <a href="https://code.visualstudio.com/" target="_blank"
+                >Visual Studio Code</a
+              >
+              um mit dem ESP32 zu interagieren
+            </p>
+          </li>
+          <li>
+            <p>
+              Navigiere zum Ordner
+              <span class="doc-list__highlight">/esp32-IoT-Button</span> und
+              öffne Ihn in VS Code
+            </p>
+            <div class="terminal">
+              <div class="terminal__header">CMD</div>
+              <div class="terminal__input">
+                <p class="terminal__line">cd esp32-IoT-Button && code .</p>
+              </div>
+            </div>
+          </li>
+          <li>
+            <p>
+              Erstelle im Ordner
+              <span class="doc-list__highlight">/src</span> die Datei
+              <span class="doc-list__highlight">/credentials.h</span>
+            </p>
+            <div class="terminal">
+              <div class="terminal__header">/esp32-IoT-Button</div>
+              <div class="terminal__input">
+                <p class="terminal__line">
+                  esp32-IoT-Button/<br />
+                  ├── src/<br />
+                  │ ├── main.cpp<br />
+                  │ └── credentials.h<br />
+                </p>
+              </div>
+            </div>
+          </li>
+          <li>
+            <p>
+              Fülle die Datei
+              <span class="doc-list__highlight">/credentials.h</span>
+              mit deinen WiFi Zugangsdaten
+            </p>
+            <div class="terminal">
+              <div class="terminal__header">credentials.h</div>
+              <div class="terminal__input">
+                <p class="terminal__file">
+                  const char *ssid = "Network Name";<br />
+                  const char *pass = "Network Password";
+                </p>
+              </div>
+            </div>
+          </li>
+          <li>
+            <p>
+              Installiere die Libraries
+              <a
+                href="https://platformio.org/lib/show/89/PubSubClient?utm_source=platformio&utm_medium=piohome"
+                target="_blank"
+                >PubSubClient</a
+              >,
+              <a
+                href="https://platformio.org/lib/show/64/ArduinoJson"
+                target="_blank"
+                >ArduinoJSON</a
+              >,
+              <a
+                href="https://platformio.org/lib/show/4423/Gesture%20PAJ7620"
+                target="_blank"
+                >Gesture PAJ7620</a
+              >
+              und
+              <a
+                href="https://platformio.org/lib/show/5355/Grove%20-%20LCD%20RGB%20Backlight"
+                target="_blank"
+                >Grove - LCD RGB Backlight</a
+              >
+            </p>
+          </li>
+          <li>
+            <p>
+              Öffne im Tab
+              <span class="doc-list__highlight">Libraries</span> von PlatformIO
+              den Ordner für die Library PubSubClient mit einem Klick auf
+              <span class="doc-list__highlight">Reveal</span>
+              <figure>
+                <img src="img/platformio-pubsub.png" />
+              </figure>
+            </p>
+          </li>
+          <li>
+            <p>
+              Navigiere zum Ordner
+              <span class="doc-list__highlight">/PubSubClient_ID89</span> und
+              öffne den Ordner
+              <span class="doc-list__highlight">/src</span>
+            </p>
+          </li>
+          <li>
+            <p>
+              Erhöhe nun in der Datei
+              <span class="doc-list__highlight">PubSubClient.h</span> den Wert
+              <span class="doc-list__highlight">MQTT_MAX_PACKET_SIZE</span> auf
+              <span class="doc-list__highlight">2048</span>
+            </p>
+            <div class="terminal">
+              <div class="terminal__header">
+                /PubSubClient_ID89/src/PubSubClient.h
+              </div>
+              <div class="terminal__input">
+                <p class="terminal__file">
+                  #define MQTT_MAX_PACKET_SIZE 2048
+                </p>
+              </div>
+            </div>
+          </li>
+          <li>
+            <p>
+              Verbinde alle Komponenten folgendermaße mit deinem ESP32 und
+              schließe Ihn dann an deinen Computer an
+            </p>
+            <iframe
+              id="ytplayer"
+              type="text/html"
+              width="1200"
+              height="675"
+              src="https://www.youtube-nocookie.com/embed/T4lWkwNdf3w?&rel=0&modestbranding=1"
+              frameborder="0"
+              allowfullscreen
+            ></iframe>
+          </li>
+          <li>
+            <p>Spiele den Code nun mit Hilfe von PlatformIO auf den ESP32</p>
+            <figure>
+              <img src="img/upload.png" />
+            </figure>
+            <p>
+              Nach dem Upload ist der ESP32 einsatzbereit und wartet darauf
+              mittels des Dashboards eingerichtet zu werden
+            </p>
+          </li>
+        </ol>
+        <h3>Setup des Backends</h3>
+        <ol class="doc-list">
+          <li>
+            <p>
+              Navigiere zum Ordner
+              <span class="doc-list__highlight">/backend</span> und öffne Ihn in
+              VS Code
+            </p>
+            <div class="terminal">
+              <div class="terminal__header">CMD</div>
+              <div class="terminal__input">
+                <p class="terminal__line">cd backend && code .</p>
+              </div>
+            </div>
+          </li>
+          <li>
+            <p>
+              Erstelle im die Datei
+              <span class="doc-list__highlight">.env</span>
+            </p>
+            <div class="terminal">
+              <div class="terminal__header">/backend</div>
+              <div class="terminal__input">
+                <p class="terminal__line">
+                  backend/<br />
+                  └─ .env<br />
+                </p>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <p>
+              Fülle die Datei
+              <span class="doc-list__highlight">.env</span>
+              mit Zugangsdaten zu einer
+              <a href="https://www.mongodb.com/de" target="_blank">mongoDB</a>
+            </p>
+            <div class="terminal">
+              <div class="terminal__header">.env</div>
+              <div class="terminal__input">
+                <p class="terminal__file">
+                  MONGODB_CONNECTION = "Link zu MongoDB"
+                </p>
+              </div>
+            </div>
+          </li>
+        </ol>
       </section>
     </main>
   </body>

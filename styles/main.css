@@ -234,4 +234,35 @@ a {
   .card__content {
     padding: 18px; }
 
+.doc-list {
+  list-style: decimal;
+  margin-bottom: 29px; }
+  .doc-list__highlight {
+    background: #ddd;
+    padding: 7px;
+    border-radius: 4px; }
+  .doc-list li {
+    margin-bottom: 47px; }
+
+.terminal {
+  background: #333;
+  color: #fff;
+  border-radius: 4px;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; }
+  .terminal__header {
+    background: #eee;
+    color: #666;
+    padding: 11px 18px; }
+  .terminal__input {
+    padding: 18px; }
+  .terminal__line {
+    margin: 0; }
+    .terminal__line:not(:last-of-type) {
+      margin-bottom: 18px; }
+    .terminal__line:before {
+      content: '> ';
+      color: #6fa7d8; }
+  .terminal__file {
+    margin: 0; }
+
 /*# sourceMappingURL=main.css.map */

@@ -122,3 +122,51 @@
     padding: $m;
   }
 }
+
+.doc-list {
+  list-style: decimal;
+  margin-bottom: $l;
+
+  &__highlight {
+    background: $light;
+    padding: $xs;
+    border-radius: 4px;
+  }
+
+  li {
+    margin-bottom: $xl;
+  }
+}
+
+.terminal {
+  background: $darker;
+  color: $lightest;
+  border-radius: 4px;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
+  &__header {
+    background: $lighter;
+    color: $dark;
+    padding: $s $m;
+  }
+
+  &__input {
+    padding: $m;
+  }
+
+  &__line {
+    margin: 0;
+
+    &:not(:last-of-type) {
+      margin-bottom: $m;
+    }
+    &:before {
+      content: '> ';
+      color: $blue;
+    }
+  }
+
+  &__file {
+    margin: 0;
+  }
+}
