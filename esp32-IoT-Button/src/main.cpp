@@ -1,3 +1,4 @@
+#include <stdlib.h> 
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <Wire.h>
@@ -129,12 +130,14 @@ void initialSetup()
 }
 
 /*** Connenct/Reconnect to MQTT Broker in Case of Connection loss ***/
-const char *broker = "hivemq.dock.moxd.io";                           //Adresse des Brokers
-const char *orderList = "thkoeln/IoT/bmw/montage/mittelkonsole/list"; //Ein Topic
-const char *outTopic = "mittelkonsole/order/";
-const char *actions = "thkoeln/IoT/bmw/montage/mittelkonsole/actionList";
-const char *modeTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/mode";
-const char *actionOut = "thkoeln/IoT/bmw/montage/mittelkonsole/action/";
+std::string baseTopic=getenv("BASETOPIC");
+
+const char *broker = getenv("MQTT_BROKER");                           //Adresse des Brokers
+const char *orderList = (baseTopic+="/list").c_str(); //Ein Topic
+const char *outTopic = (baseTopic+="/order/").c_str();
+const char *actions = (baseTopic+="/actionList").c_str();
+const char *modeTopic =(baseTopic+="/mode").c_str();
+const char *actionOut =(baseTopic+="/action/").c_str();
 void reconnect()
 {
   // Loop until we're reconnected
@@ -172,7 +175,7 @@ void callback(char *topic, byte *payload, unsigned int length)
   lcd.setCursor(0, 0);
   lcd.print("Updating...");
   Serial.println(topic);
-  String setup = "thkoeln/IoT/setup/";
+  String setup =(baseTopic+="/setup/").c_str();
   setup += WiFi.macAddress();
   Serial.println(setup);
   const char *c = setup.c_str();
@@ -194,7 +197,7 @@ void callback(char *topic, byte *payload, unsigned int length)
       mitarbeiterID = value;
     }
   }
-  if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/mode") == 0)
+  if (strcmp(topic,(baseTopic+="/mode").c_str()) == 0)
   {
     char buffer[128];
     memcpy(buffer, payload, length);
@@ -222,7 +225,7 @@ void callback(char *topic, byte *payload, unsigned int length)
       Serial.println(mode);
     }
   }
-  if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/list") == 0 && mode == ORDER_MODE)
+  if (strcmp(topic,(baseTopic+="/list").c_str()) == 0 && mode == ORDER_MODE)
   {
     for (int i = 0; i < length; i++)
     {
@@ -235,7 +238,7 @@ void callback(char *topic, byte *payload, unsigned int length)
     if (hits >= len)
       hits = len - 1;
   }
-  else if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/actionList") == 0 && mode == ACTION_MODE)
+  else if (strcmp(topic,(baseTopic+="/actionList").c_str()) == 0 && mode == ACTION_MODE)
   {
     for (int i = 0; i < length; i++)
     {
