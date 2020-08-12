@@ -83,6 +83,7 @@ byte bottomRightCheck[] = {
     B11000,
     B10000};
 
+std::string baseTopic=getenv("BASETOPIC");
 /*** Initales verbinden mit WLAN ***/
 void setupWifi()
 {
@@ -121,8 +122,8 @@ void initialSetup()
   lcd.setCursor(0, 0);
   lcd.print("Init Setup");
   Serial.println("Intial Setup");
-  client.publish("thkoeln/IoT/setup", WiFi.macAddress().c_str());
-  String in = "thkoeln/IoT/setup/";
+  client.publish((baseTopic+="/setup/").c_str(), WiFi.macAddress().c_str());
+  String in = (baseTopic+="/setup/").c_str();
   in += WiFi.macAddress();
   Serial.println(in);
   const char *c = in.c_str();
@@ -130,7 +131,7 @@ void initialSetup()
 }
 
 /*** Connenct/Reconnect to MQTT Broker in Case of Connection loss ***/
-std::string baseTopic=getenv("BASETOPIC");
+
 
 const char *broker = getenv("MQTT_BROKER");                           //Adresse des Brokers
 const char *orderList = (baseTopic+="/list").c_str(); //Ein Topic
