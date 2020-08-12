@@ -119,9 +119,10 @@ void initialSetup()
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Init Setup");
+  String setup = (baseTopic + "/setup");
   Serial.println("Intial Setup");
-  client.publish("thkoeln/IoT/setup", WiFi.macAddress().c_str());
-  String in = "thkoeln/IoT/setup/";
+  client.publish(setup.c_str(), WiFi.macAddress().c_str());
+  String in = (setup + "/");
   in += WiFi.macAddress();
   Serial.println(in);
   const char *c = in.c_str();
@@ -129,12 +130,11 @@ void initialSetup()
 }
 
 /*** Connenct/Reconnect to MQTT Broker in Case of Connection loss ***/
-const char *broker = "hivemq.dock.moxd.io";                           //Adresse des Brokers
-const char *orderList = "thkoeln/IoT/bmw/montage/mittelkonsole/list"; //Ein Topic
-const char *outTopic = "mittelkonsole/order/";
-const char *actions = "thkoeln/IoT/bmw/montage/mittelkonsole/actionList";
-const char *modeTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/mode";
-const char *actionOut = "thkoeln/IoT/bmw/montage/mittelkonsole/action/";
+const char *orderList = (baseTopic + "/list").c_str();
+const char *outTopic = (baseTopic + "/order/").c_str();
+const char *actions = (baseTopic + "/actionList").c_str();
+const char *modeTopic = (baseTopic + "/mode").c_str();
+const char *actionOut = (baseTopic + "/action/").c_str();
 void reconnect()
 {
   // Loop until we're reconnected
@@ -172,7 +172,7 @@ void callback(char *topic, byte *payload, unsigned int length)
   lcd.setCursor(0, 0);
   lcd.print("Updating...");
   Serial.println(topic);
-  String setup = "thkoeln/IoT/setup/";
+  String setup = (baseTopic + "/setup/");
   setup += WiFi.macAddress();
   Serial.println(setup);
   const char *c = setup.c_str();
