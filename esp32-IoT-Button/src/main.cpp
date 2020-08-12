@@ -83,7 +83,7 @@ byte bottomRightCheck[] = {
     B11000,
     B10000};
 
-std::string baseTopic=getenv("BASETOPIC");
+
 /*** Initales verbinden mit WLAN ***/
 void setupWifi()
 {
@@ -118,12 +118,14 @@ void setupWifi()
 
 void initialSetup()
 {
+    std::string ssetup =baseTopic+ std::string("/setup/");                 //Adresse des Brokers
+  const char *setupTopic = ssetup.c_str();
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Init Setup");
   Serial.println("Intial Setup");
-  client.publish((baseTopic+="/setup/").c_str(), WiFi.macAddress().c_str());
-  String in = (baseTopic+="/setup/").c_str();
+  client.publish(setupTopic, WiFi.macAddress().c_str());
+  String in = setupTopic;
   in += WiFi.macAddress();
   Serial.println(in);
   const char *c = in.c_str();
@@ -133,12 +135,17 @@ void initialSetup()
 /*** Connenct/Reconnect to MQTT Broker in Case of Connection loss ***/
 
 
-const char *broker = getenv("MQTT_BROKER");                           //Adresse des Brokers
-const char *orderList = (baseTopic+="/list").c_str(); //Ein Topic
-const char *outTopic = (baseTopic+="/order/").c_str();
-const char *actions = (baseTopic+="/actionList").c_str();
-const char *modeTopic =(baseTopic+="/mode").c_str();
-const char *actionOut =(baseTopic+="/action/").c_str();
+const char *broker = mqtt_broker;          
+std::string sorderList =baseTopic+ std::string("/list");                 //Adresse des Brokers
+const char *orderList = sorderList.c_str(); //Ein Topic
+std::string soutTopic =baseTopic+ std::string("/order/");     
+const char *outTopic = soutTopic.c_str();
+std::string sactions =baseTopic+ std::string("/actionList");     
+const char *actions =  sactions.c_str();
+std::string smodeTopic =baseTopic+ std::string("/mode");     
+const char *modeTopic =smodeTopic.c_str();
+std::string sactionOut =baseTopic+ std::string("/action/");     
+const char *actionOut =sactionOut.c_str();
 void reconnect()
 {
   // Loop until we're reconnected
@@ -172,11 +179,15 @@ void reconnect()
 /*** Funktion welche ausgeführt wird, wenn eine Nachricht auf einem abbonierten Topic ankommt ***/
 void callback(char *topic, byte *payload, unsigned int length)
 {
+  std::string smodeTopic =baseTopic+ std::string("/mode");     
+  const char *modeTopic =smodeTopic.c_str();
+  std::string sactions =baseTopic+ std::string("/actionList");     
+  const char *actions =  sactions.c_str();
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Updating...");
   Serial.println(topic);
-  String setup =(baseTopic+="/setup/").c_str();
+  String setup = modeTopic;
   setup += WiFi.macAddress();
   Serial.println(setup);
   const char *c = setup.c_str();
@@ -198,7 +209,7 @@ void callback(char *topic, byte *payload, unsigned int length)
       mitarbeiterID = value;
     }
   }
-  if (strcmp(topic,(baseTopic+="/mode").c_str()) == 0)
+  if (strcmp(topic, modeTopic) == 0)
   {
     char buffer[128];
     memcpy(buffer, payload, length);
@@ -226,7 +237,7 @@ void callback(char *topic, byte *payload, unsigned int length)
       Serial.println(mode);
     }
   }
-  if (strcmp(topic,(baseTopic+="/list").c_str()) == 0 && mode == ORDER_MODE)
+  if (strcmp(topic,modeTopic) == 0 && mode == ORDER_MODE)
   {
     for (int i = 0; i < length; i++)
     {
@@ -239,7 +250,7 @@ void callback(char *topic, byte *payload, unsigned int length)
     if (hits >= len)
       hits = len - 1;
   }
-  else if (strcmp(topic,(baseTopic+="/actionList").c_str()) == 0 && mode == ACTION_MODE)
+  else if (strcmp(topic,actions) == 0 && mode == ACTION_MODE)
   {
     for (int i = 0; i < length; i++)
     {
