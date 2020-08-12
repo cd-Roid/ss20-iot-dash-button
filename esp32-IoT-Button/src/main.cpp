@@ -119,9 +119,10 @@ void initialSetup()
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Init Setup");
+  String setup = (baseTopic + "/setup");
   Serial.println("Intial Setup");
-  client.publish("thkoeln/IoT/setup", WiFi.macAddress().c_str());
-  String in = "thkoeln/IoT/setup/";
+  client.publish(setup.c_str(), WiFi.macAddress().c_str());
+  String in = (setup + "/");
   in += WiFi.macAddress();
   Serial.println(in);
   const char *c = in.c_str();
@@ -129,12 +130,11 @@ void initialSetup()
 }
 
 /*** Connenct/Reconnect to MQTT Broker in Case of Connection loss ***/
-const char *broker = "hivemq.dock.moxd.io";                           //Adresse des Brokers
-const char *orderList = "thkoeln/IoT/bmw/montage/mittelkonsole/list"; //Ein Topic
-const char *outTopic = "mittelkonsole/order/";
-const char *actions = "thkoeln/IoT/bmw/montage/mittelkonsole/actionList";
-const char *modeTopic = "thkoeln/IoT/bmw/montage/mittelkonsole/mode";
-const char *actionOut = "thkoeln/IoT/bmw/montage/mittelkonsole/action/";
+String orderList = (baseTopic + "/list");
+String outTopic = (baseTopic + "/order/");
+String actions = (baseTopic + "/actionList");
+String modeTopic = (baseTopic + "/mode");
+String actionOut = (baseTopic + "/action/");
 void reconnect()
 {
   // Loop until we're reconnected
@@ -148,7 +148,7 @@ void reconnect()
     if (client.connect(clientId.c_str()))
     {
       Serial.println("connected");
-      client.subscribe(modeTopic);
+      client.subscribe(modeTopic.c_str());
       if (mitarbeiterID == 255)
       {
         initialSetup();
@@ -172,7 +172,7 @@ void callback(char *topic, byte *payload, unsigned int length)
   lcd.setCursor(0, 0);
   lcd.print("Updating...");
   Serial.println(topic);
-  String setup = "thkoeln/IoT/setup/";
+  String setup = (baseTopic + "/setup/");
   setup += WiFi.macAddress();
   Serial.println(setup);
   const char *c = setup.c_str();
@@ -194,7 +194,7 @@ void callback(char *topic, byte *payload, unsigned int length)
       mitarbeiterID = value;
     }
   }
-  if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/mode") == 0)
+  if (strcmp(topic, modeTopic.c_str()) == 0)
   {
     char buffer[128];
     memcpy(buffer, payload, length);
@@ -210,19 +210,19 @@ void callback(char *topic, byte *payload, unsigned int length)
       mode = value;
       if (mode == ACTION_MODE)
       {
-        client.subscribe(actions);
-        client.unsubscribe(orderList);
+        client.subscribe(actions.c_str());
+        client.unsubscribe(orderList.c_str());
       }
       else if (mode == ORDER_MODE)
       {
-        client.subscribe(orderList);
-        client.unsubscribe(actions);
+        client.subscribe(orderList.c_str());
+        client.unsubscribe(actions.c_str());
       }
       Serial.println("mode: ");
       Serial.println(mode);
     }
   }
-  if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/list") == 0 && mode == ORDER_MODE)
+  if (strcmp(topic, orderList.c_str()) == 0 && mode == ORDER_MODE)
   {
     for (int i = 0; i < length; i++)
     {
@@ -235,7 +235,7 @@ void callback(char *topic, byte *payload, unsigned int length)
     if (hits >= len)
       hits = len - 1;
   }
-  else if (strcmp(topic, "thkoeln/IoT/bmw/montage/mittelkonsole/actionList") == 0 && mode == ACTION_MODE)
+  else if (strcmp(topic, actions.c_str()) == 0 && mode == ACTION_MODE)
   {
     for (int i = 0; i < length; i++)
     {
@@ -289,6 +289,8 @@ void reset()
 void setup()
 {
   Serial.begin(9600);
+  Serial.println(modeTopic);
+  Serial.println(outTopic);
   ESP32Encoder::useInternalWeakPullResistors = UP;
   encoder.attachHalfQuad(14, 27);
   encoder.setCount(0);

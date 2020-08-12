@@ -17,9 +17,9 @@ const setupID = require('./Models/setupIDModel');
 const Employee = require('./Models/employeeModel');
 const modeModel = require('./Models/modeModel');
 
-let list = [];
+const baseTopic = process.env.BASETOPIC;
 
-var client = mqtt.connect('mqtt://hivemq.dock.moxd.io');
+var client = mqtt.connect(`mqtt://${process.env.MQTT_BROKER}`);
 Mongoose.connect(process.env.MONGODB_CONNECTION, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
@@ -29,32 +29,32 @@ db.on('error', (err) => console.error(err));
 db.once('open', () => console.log('Connected to db'));
 
 client.on('connect', function () {
-  client.subscribe('mittelkonsole/order/+', function (err) {
+  client.subscribe(baseTopic + '/order/+', function (err) {
     console.error(err);
   });
-  client.subscribe('thkoeln/IoT/bmw/montage/mittelkonsole/action/+', function (
+  client.subscribe(baseTopic + '/action/+', function (
     err,
   ) {
     console.error(err);
   });
-  client.subscribe('thkoeln/IoT/bmw/montage/mittelkonsole/list', function (
+  client.subscribe(baseTopic + '/list', function (
     err,
   ) {
     console.error(err);
   });
   client.subscribe(
-    'thkoeln/IoT/bmw/montage/mittelkonsole/actionList',
+    baseTopic + '/actionList',
     function (err) {
       console.error(err);
     },
   );
-  client.subscribe('thkoeln/IoT/bmw/montage/mittelkonsole/mode', function (
+  client.subscribe(baseTopic + '/mode', function (
     err,
   ) {
     console.error(err);
   });
 
-  client.subscribe('thkoeln/IoT/setup', (err) => {
+  client.subscribe(baseTopic + '/setup', (err) => {
     console.error(err);
   });
 });
@@ -70,7 +70,7 @@ client.on('message', async function (topic, message) {
       console.log(err);
     }
     // console.log('Message:' + message.toString());
-    if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/list') {
+    if (topic == baseTopic + '/list') {
       console.log('on RECIVE:' + JSON.stringify(computedMessage));
       productList.remove({}, (err) => {
         if (err) throw err;
@@ -79,7 +79,7 @@ client.on('message', async function (topic, message) {
         console.log("Sending new List to Client...")
         io.emit('productList', data);
       });
-    } else if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/actionList') {
+    } else if (topic == baseTopic + '/actionList') {
       Actions.remove({}, (err) => {
         if (err) throw err;
       });
@@ -87,7 +87,7 @@ client.on('message', async function (topic, message) {
         console.log("Sending new List to Client...")
         io.emit('actions', data);
       });
-    } else if (topic == 'thkoeln/IoT/bmw/montage/mittelkonsole/mode') {
+    } else if (topic == baseTopic + '/mode') {
       let newMode = new Mode({ mode: computedMessage });
       Mode.remove({}, (err) => {
         if (err) throw err;
@@ -101,7 +101,7 @@ client.on('message', async function (topic, message) {
       });
       io.emit('mode', computedMessage);
     } else if (
-      topic.startsWith('thkoeln/IoT/bmw/montage/mittelkonsole/action/')
+      topic.startsWith(baseTopic + '/action/')
     ) {
       let eID = topic.split('/');
       eID = eID[eID.length - 1];
@@ -122,7 +122,7 @@ client.on('message', async function (topic, message) {
       let name = mitarbeiter.find((elem) => elem.eID == orderedAction.eID);
       orderedAction.employee = name ? name.name : orderedAction.eID;
       io.emit('orderedAction', orderedAction);
-    } else if (topic.startsWith('mittelkonsole/order/')) {
+    } else if (topic.startsWith(baseTopic + '/order/')) {
       let id = topic.split('/');
       id = id[id.length - 1];
       let newOrder = new Orders({
@@ -143,7 +143,7 @@ client.on('message', async function (topic, message) {
       let name = mitarbeiter.find((elem) => elem.eID == newOrder.eID);
       newOrder.employee = name ? name.name : newOrder.eID;
       io.emit('orderedProduct', newOrder);
-    } else if (topic == 'thkoeln/IoT/setup') {
+    } else if (topic == baseTopic + '/setup') {
       let device = await setupID.findOne({ SetupId: computedMessage });
       if (device) {
         io.emit('setupID', device);
@@ -216,7 +216,7 @@ io.on('connection', async (socket) => {
 
   socket.on('mode_change', (msg) => {
     client.publish(
-      'thkoeln/IoT/bmw/montage/mittelkonsole/mode',
+      baseTopic + '/mode',
       msg.toString(),
       { retain: true },
     );
@@ -230,7 +230,7 @@ io.on('connection', async (socket) => {
       quantity: msg.quantity,
       step: msg.step,
     });
-    client.publish('thkoeln/IoT/bmw/montage/mittelkonsole/list', JSON.stringify(products), {
+    client.publish(baseTopic + '/list', JSON.stringify(products), {
       retain: true,
     });
   });
@@ -239,7 +239,7 @@ io.on('connection', async (socket) => {
     actions.push({
       name: msg.name,
     });
-    client.publish('thkoeln/IoT/bmw/montage/mittelkonsole/actionList', JSON.stringify(actions), {
+    client.publish(baseTopic + '/actionList', JSON.stringify(actions), {
       retain: true,
     });
   });
@@ -249,7 +249,7 @@ io.on('connection', async (socket) => {
     });
     Actions.find({}, '-_id -__v').then((data) => {
       const newList = JSON.stringify(data);
-      client.publish('thkoeln/IoT/bmw/montage/mittelkonsole/actionList', newList, {
+      client.publish(baseTopic + '/actionList', newList, {
         retain: true,
       });
     });
@@ -261,7 +261,7 @@ io.on('connection', async (socket) => {
     });
     productList.find({}, '-_id -__v').then((data) => {
       const newList = JSON.stringify(data);
-      client.publish('thkoeln/IoT/bmw/montage/mittelkonsole/list', newList, {
+      client.publish(baseTopic + '/list', newList, {
         retain: true,
       });
     });
@@ -287,7 +287,7 @@ io.on('connection', async (socket) => {
     const newEmployee = new Employee({ name: msg.name, eID: msg.eID, setupID: msg.setupID });
     await newEmployee.save();
     await setupID.deleteOne({ SetupId: msg.setupID });
-    client.publish('thkoeln/IoT/setup/' + msg.setupID, msg.eID.toString(), {
+    client.publish(baseTopic + '/setup/' + msg.setupID, msg.eID.toString(), {
       retain: false,
     });
     console.log('message: ' + msg);
