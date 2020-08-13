@@ -282,5 +282,11 @@ footer {
   max-width: 1200px;
   margin: 0 auto;
   padding: 11px 18px; }
+  .footer a {
+    color: #156ebc; }
+  .footer__headline {
+    color: #fff;
+    margin-top: 11px;
+    margin-bottom: 7px; }
 
 /*# sourceMappingURL=main.css.map */

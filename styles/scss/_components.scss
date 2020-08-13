@@ -192,4 +192,14 @@ footer {
   max-width: 1200px;
   margin: 0 auto;
   padding: $s $m;
+
+  & a {
+    color: $dark-blue;
+  }
+
+  &__headline {
+    color: $lightest;
+    margin-top: $s;
+    margin-bottom: $xs;
+  }
 }
