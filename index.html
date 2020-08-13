@@ -32,7 +32,7 @@
             <a class="head__nav-link" href="#software">Software</a>
           </li>
           <li class="head__nav-item">
-            <a class="head__nav-link" href="#docs">Documentation</a>
+            <a class="head__nav-link" href="#install">Installation</a>
           </li>
         </ul>
       </nav>
@@ -356,8 +356,8 @@
         </ul>
       </section>
 
-      <section class="section" id="documentation">
-        <h2>Documentation</h2>
+      <section class="section" id="install">
+        <h2>Installation</h2>
         <h3>Allgemeines Setup</h3>
         <ol class="doc-list">
           <li>
@@ -368,7 +368,7 @@
                 target="_blank"
                 >https://github.com/cd-Roid/ss20-iot-dash-button</a
               >
-              und wechsle in den Ordner
+              und wechsle in den Ordner <span class="doc-list__highlight">ss20-iot-dash-button</span>
             </p>
             <div class="terminal">
               <div class="terminal__header">CMD</div>
@@ -577,13 +577,17 @@
               Fülle die Datei
               <span class="doc-list__highlight">.env</span>
               mit Zugangsdaten zu einer
-              <a href="https://www.mongodb.com/de" target="_blank">mongoDB</a>
+              <a href="https://www.mongodb.com/de" target="_blank">mongoDB</a>,
+              dem Broker und deiner Basis Topic.<p>Der Broker und die Topic
+              müssen die selben sein, wie auf dem ESP32.</p>
             </p>
             <div class="terminal">
               <div class="terminal__header">.env</div>
               <div class="terminal__input">
                 <p class="terminal__file">
-                  MONGODB_CONNECTION = "Link zur MongoDB"
+                  MONGODB_CONNECTION = "Link zur MongoDB"<br />
+                  MQTT_BROKER = hivemq.dock.moxd.io<br />
+                  BASETOPIC = "BasisTopic"
                 </p>
               </div>
             </div>
