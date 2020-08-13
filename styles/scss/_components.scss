@@ -97,6 +97,13 @@
   margin-bottom: $xl;
 }
 
+.hardware-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: $m;
+  margin-bottom: $xl;
+}
+
 .card {
   box-shadow: $shadow;
   //border: 1px solid $lighter;
@@ -112,6 +119,10 @@
     background: $lighter;
     text-align: center;
     padding: $l 0;
+
+    &--img {
+      padding: $l $l;
+    }
   }
 
   &__headline {
