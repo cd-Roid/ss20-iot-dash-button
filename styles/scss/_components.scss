@@ -7,6 +7,7 @@
   position: fixed;
   width: 100%;
   backdrop-filter: blur(2px);
+  z-index: 1;
 
   &__logo {
     margin-bottom: 0;

@@ -429,14 +429,25 @@
             <p>
               Fülle die Datei
               <span class="doc-list__highlight">/credentials.h</span>
-              mit deinen WiFi Zugangsdaten
+              mit deinen WiFi Zugangsdaten, deinem MQTT Broker und der Basis
+              Topic (zum Beispiel die Abteilung oder das Unternehmen).
+            </p>
+            <p>
+              Eine Liste von öffentlichen MQTT Brokern findest du hier:
+              <a
+                href="https://moxd.io/2015/10/17/public-mqtt-brokers/"
+                target="_blank"
+                >https://moxd.io/2015/10/17/public-mqtt-brokers/</a
+              >
             </p>
             <div class="terminal">
               <div class="terminal__header">credentials.h</div>
               <div class="terminal__input">
                 <p class="terminal__file">
                   const char *ssid = "Network Name";<br />
-                  const char *pass = "Network Password";
+                  const char *pass = "Network Password";<br />
+                  const char *broker = "hivemq.dock.moxd.io"; <br />
+                  String baseTopic = "BasisTopic";
                 </p>
               </div>
             </div>
@@ -572,7 +583,7 @@
               <div class="terminal__header">.env</div>
               <div class="terminal__input">
                 <p class="terminal__file">
-                  MONGODB_CONNECTION = "Link zu MongoDB"
+                  MONGODB_CONNECTION = "Link zur MongoDB"
                 </p>
               </div>
             </div>
