@@ -101,7 +101,6 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-gap: $m;
-  margin-bottom: $xl;
 }
 
 .card {
@@ -182,4 +181,15 @@
   &__file {
     margin: 0;
   }
+}
+
+footer {
+  color: $lightest;
+  background: $blue;
+}
+
+.footer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $s $m;
 }
