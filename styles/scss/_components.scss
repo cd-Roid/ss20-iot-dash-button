@@ -69,11 +69,30 @@
   grid-template-columns: 1fr 1fr;
   grid-gap: $m;
 
+  &__image {
+    &--inner-shadow {
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.8));
+      transition: all 0.3s ease;
+
+      &:hover {
+        filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.8));
+      }
+    }
+  }
+
   &__hero {
     box-shadow: $shadow;
     transition: $tr-shadow;
     margin-bottom: $l;
     display: flex;
+
+    &--inner-shadow {
+      box-shadow: none;
+
+      &:hover {
+        box-shadow: none !important;
+      }
+    }
 
     &:hover {
       box-shadow: $shadow-hover;
