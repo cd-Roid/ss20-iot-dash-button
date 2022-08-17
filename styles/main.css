@@ -55,13 +55,13 @@ table {
   font-family: Raleway;
   font-style: normal;
   font-weight: 500;
-  src: url("/fonts/Raleway/Raleway-Medium.ttf"); }
+  src: url("../fonts/Raleway/Raleway-Medium.ttf"); }
 
 @font-face {
   font-family: Raleway;
   font-style: normal;
   font-weight: 600;
-  src: url("/fonts/Raleway/Raleway-Bold.ttf"); }
+  src: url("../fonts/Raleway/Raleway-Bold.ttf"); }
 
 /* Sizes
 Using Lucas Numbers 1, 3, 4, 7, 11, 18, 29, 47, 76, 
